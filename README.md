@@ -55,7 +55,8 @@ cp -i    global/CLAUDE.md ~/.claude/CLAUDE.md
     ├── quick-commit.md        # commit rápido con mensaje auto
     ├── commit-push-pr.md      # flujo completo hasta PR
     ├── techdebt.md            # limpieza fin de sesión
-    └── worktree.md            # git worktree paralelo
+    ├── worktree.md            # git worktree paralelo
+    └── cierre-sesion.md       # cierre completo de sesión
 ```
 
 Tras la instalación:
