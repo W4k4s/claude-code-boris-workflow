@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # claude-code-boris-workflow — installer
-# Copies global workflow files into Claude Code, Codex and OpenCode homes with conflict detection.
+# Installs Boris workflow files for Claude Code, Codex and OpenCode with conflict detection.
 
 set -euo pipefail
 
 REPO_URL="https://github.com/W4k4s/claude-code-boris-workflow.git"
 CLAUDE_DEST="${CLAUDE_HOME:-$HOME/.claude}"
 CODEX_DEST="${CODEX_HOME:-$HOME/.codex}"
+CODEX_SKILLS_DEST="${CODEX_SKILLS_HOME:-$HOME/.agents/skills}"
 OPENCODE_DEST="${OPENCODE_CONFIG_DIR:-$HOME/.config/opencode}"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -15,16 +16,57 @@ bold=$(tput bold 2>/dev/null || printf '')
 dim=$(tput dim 2>/dev/null || printf '')
 reset=$(tput sgr0 2>/dev/null || printf '')
 
-echo "${bold}claude-code-boris-workflow installer${reset}"
-echo "Claude Code: $CLAUDE_DEST"
-echo "Codex:       $CODEX_DEST"
-echo "OpenCode:    $OPENCODE_DEST"
-echo
+install_claude=false
+install_codex=false
+install_opencode=false
 
-mkdir -p \
-    "$CLAUDE_DEST/agents" "$CLAUDE_DEST/commands" \
-    "$CODEX_DEST/agents" \
-    "$OPENCODE_DEST/agents" "$OPENCODE_DEST/commands"
+usage() {
+    cat <<'USAGE'
+Usage: ./install.sh [--all] [--claude] [--codex] [--opencode]
+
+Options:
+  --all       Install Claude Code, Codex and OpenCode workflow files (default)
+  --claude    Install only Claude Code files under ~/.claude
+  --codex     Install only Codex files under ~/.codex and ~/.agents/skills
+  --opencode  Install only OpenCode files under ~/.config/opencode
+  -h, --help  Show this help
+USAGE
+}
+
+if [[ $# -eq 0 ]]; then
+    install_claude=true
+    install_codex=true
+    install_opencode=true
+else
+    for arg in "$@"; do
+        case "$arg" in
+            --all)
+                install_claude=true
+                install_codex=true
+                install_opencode=true
+                ;;
+            --claude) install_claude=true ;;
+            --codex) install_codex=true ;;
+            --opencode) install_opencode=true ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            *)
+                echo "Opcion desconocida: $arg" >&2
+                usage >&2
+                exit 1
+                ;;
+        esac
+    done
+fi
+
+echo "${bold}claude-code-boris-workflow installer${reset}"
+echo "Claude Code:  $CLAUDE_DEST"
+echo "Codex:        $CODEX_DEST"
+echo "Codex skills: $CODEX_SKILLS_DEST"
+echo "OpenCode:     $OPENCODE_DEST"
+echo
 
 if [[ -n "${BORIS_WORKFLOW_SRC:-}" ]]; then
     echo "${dim}Usando repo local en $BORIS_WORKFLOW_SRC...${reset}"
@@ -52,14 +94,14 @@ copy_template_only() {
     fi
 
     if diff -q "$src_file" "$dest_file" >/dev/null 2>&1; then
-        echo "  = ya al día: $label"
+        echo "  = ya al dia: $label"
         return
     fi
 
     echo "  ! ya existe: $label. No lo toco."
-    echo "  Diff (actual → template):"
+    echo "  Diff (actual -> template):"
     diff -u "$dest_file" "$src_file" || true
-    echo "  → copia manualmente las secciones que te falten."
+    echo "  -> copia manualmente las secciones que te falten."
 }
 
 copy_one() {
@@ -74,13 +116,13 @@ copy_one() {
     fi
 
     if diff -q "$src_file" "$dest_file" >/dev/null 2>&1; then
-        echo "  = ya al día: $label"
+        echo "  = ya al dia: $label"
         return
     fi
 
     echo
     echo "${bold}CONFLICTO${reset}: $label ya existe y es distinto."
-    echo "Diff (actual → entrante):"
+    echo "Diff (actual -> entrante):"
     diff -u "$dest_file" "$src_file" || true
     echo
     read -r -p "[o]verwrite / [s]kip / [b]ackup (.bak) y sobreescribir ? " choice
@@ -91,52 +133,98 @@ copy_one() {
     esac
 }
 
-echo
-echo "${bold}Claude Code agents${reset}"
-for f in "$SRC"/agents/*.md; do
-    copy_one "$f" "$CLAUDE_DEST/agents/$(basename "$f")" "~/.claude/agents/$(basename "$f")"
-done
+copy_tree_files() {
+    local src_dir="$1"
+    local dest_dir="$2"
+    local label_prefix="$3"
 
-echo
-echo "${bold}Claude Code commands${reset}"
-for f in "$SRC"/commands/*.md; do
-    copy_one "$f" "$CLAUDE_DEST/commands/$(basename "$f")" "~/.claude/commands/$(basename "$f")"
-done
+    mkdir -p "$dest_dir"
+    for f in "$src_dir"/*; do
+        [[ -f "$f" ]] || continue
+        copy_one "$f" "$dest_dir/$(basename "$f")" "$label_prefix/$(basename "$f")"
+    done
+}
 
-echo
-echo "${bold}CLAUDE.md global${reset}"
-copy_template_only "$SRC/CLAUDE.md" "$CLAUDE_DEST/CLAUDE.md" "~/.claude/CLAUDE.md"
+copy_skill_dir() {
+    local src_dir="$1"
+    local dest_dir="$2"
+    local label="$3"
 
-echo
-echo "${bold}Codex agents${reset}"
-for f in "$SRC"/codex/agents/*.toml; do
-    copy_one "$f" "$CODEX_DEST/agents/$(basename "$f")" "~/.codex/agents/$(basename "$f")"
-done
+    mkdir -p "$dest_dir"
+    copy_one "$src_dir/SKILL.md" "$dest_dir/SKILL.md" "$label/SKILL.md"
+}
 
-echo
-echo "${bold}Codex AGENTS.md global${reset}"
-copy_template_only "$SRC/codex/AGENTS.md" "$CODEX_DEST/AGENTS.md" "~/.codex/AGENTS.md"
+install_claude_files() {
+    mkdir -p "$CLAUDE_DEST/agents" "$CLAUDE_DEST/commands"
 
-echo
-echo "${bold}OpenCode agents${reset}"
-for f in "$SRC"/opencode/agents/*.md; do
-    copy_one "$f" "$OPENCODE_DEST/agents/$(basename "$f")" "~/.config/opencode/agents/$(basename "$f")"
-done
+    echo
+    echo "${bold}Claude Code agents${reset}"
+    copy_tree_files "$SRC/agents" "$CLAUDE_DEST/agents" "~/.claude/agents"
 
-echo
-echo "${bold}OpenCode commands${reset}"
-for f in "$SRC"/opencode/commands/*.md; do
-    copy_one "$f" "$OPENCODE_DEST/commands/$(basename "$f")" "~/.config/opencode/commands/$(basename "$f")"
-done
+    echo
+    echo "${bold}Claude Code commands${reset}"
+    copy_tree_files "$SRC/commands" "$CLAUDE_DEST/commands" "~/.claude/commands"
 
-echo
-echo "${bold}OpenCode config${reset}"
-copy_one "$SRC/opencode/opencode.json" "$OPENCODE_DEST/opencode.json" "~/.config/opencode/opencode.json"
+    echo
+    echo "${bold}CLAUDE.md global${reset}"
+    copy_template_only "$SRC/CLAUDE.md" "$CLAUDE_DEST/CLAUDE.md" "~/.claude/CLAUDE.md"
+}
 
-echo
-echo "${bold}OpenCode AGENTS.md global${reset}"
-copy_template_only "$SRC/opencode/AGENTS.md" "$OPENCODE_DEST/AGENTS.md" "~/.config/opencode/AGENTS.md"
+install_codex_files() {
+    mkdir -p "$CODEX_DEST/agents" "$CODEX_DEST/rules" "$CODEX_SKILLS_DEST"
+
+    echo
+    echo "${bold}Codex agents${reset}"
+    copy_tree_files "$SRC/codex/agents" "$CODEX_DEST/agents" "~/.codex/agents"
+
+    echo
+    echo "${bold}Codex skills${reset}"
+    for d in "$SRC"/codex/skills/*; do
+        [[ -d "$d" ]] || continue
+        copy_skill_dir "$d" "$CODEX_SKILLS_DEST/$(basename "$d")" "~/.agents/skills/$(basename "$d")"
+    done
+
+    echo
+    echo "${bold}Codex rules${reset}"
+    copy_tree_files "$SRC/codex/rules" "$CODEX_DEST/rules" "~/.codex/rules"
+
+    echo
+    echo "${bold}Codex AGENTS.md global${reset}"
+    copy_template_only "$SRC/codex/AGENTS.md" "$CODEX_DEST/AGENTS.md" "~/.codex/AGENTS.md"
+}
+
+install_opencode_files() {
+    mkdir -p "$OPENCODE_DEST/agents" "$OPENCODE_DEST/commands"
+
+    echo
+    echo "${bold}OpenCode agents${reset}"
+    copy_tree_files "$SRC/opencode/agents" "$OPENCODE_DEST/agents" "~/.config/opencode/agents"
+
+    echo
+    echo "${bold}OpenCode commands${reset}"
+    copy_tree_files "$SRC/opencode/commands" "$OPENCODE_DEST/commands" "~/.config/opencode/commands"
+
+    echo
+    echo "${bold}OpenCode config${reset}"
+    copy_one "$SRC/opencode/opencode.json" "$OPENCODE_DEST/opencode.json" "~/.config/opencode/opencode.json"
+
+    echo
+    echo "${bold}OpenCode AGENTS.md global${reset}"
+    copy_template_only "$SRC/opencode/AGENTS.md" "$OPENCODE_DEST/AGENTS.md" "~/.config/opencode/AGENTS.md"
+}
+
+if [[ "$install_claude" == true ]]; then
+    install_claude_files
+fi
+
+if [[ "$install_codex" == true ]]; then
+    install_codex_files
+fi
+
+if [[ "$install_opencode" == true ]]; then
+    install_opencode_files
+fi
 
 echo
 echo "${bold}Listo.${reset}"
-echo "Siguiente paso: abre Claude Code, Codex u OpenCode en cualquier proyecto y prueba un flujo de planificacion."
+echo "Siguiente paso: abre la herramienta instalada y prueba un flujo de planificacion."

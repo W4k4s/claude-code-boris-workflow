@@ -38,6 +38,13 @@ Sustituye o amplia la seccion "Perfil" con tus datos. El resto puedes dejarlo ta
 - No ejecutes subagentes en paralelo sobre el mismo working tree si van a editar archivos; usa worktrees separados.
 
 ## Comandos Multi-Tool
+- `/grill`: review adversarial pre-ship.
+- `/review-changes`: revisar cambios sin commitear.
+- `/quick-commit`: commit rapido con mensaje descriptivo.
+- `/commit-push-pr`: commit, push y PR.
+- `/techdebt`: limpieza fin de sesion.
+- `/worktree`: worktree paralelo.
+- `/cierre-sesion`: cierre completo de sesion.
 - `/ask-claude`: consulta Claude Code en modo plan/read-only. Requiere confirmar antes de ejecutar.
 - `/ask-codex`: consulta Codex en sandbox read-only. Requiere confirmar antes de ejecutar.
 - No uses flags de bypass, danger o skip permissions al invocar otras herramientas salvo peticion explicita y sandbox externo.

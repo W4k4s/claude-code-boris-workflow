@@ -1,0 +1,50 @@
+# Boris safety guardrails for Codex command escalation.
+
+prefix_rule(
+    pattern = ["git", "push", "--force"],
+    decision = "prompt",
+    justification = "Force-push requiere confirmacion explicita del usuario.",
+    match = ["git push --force", "git push --force origin feature"],
+)
+
+prefix_rule(
+    pattern = ["git", "push", "--force-with-lease"],
+    decision = "prompt",
+    justification = "Force-push requiere confirmacion explicita del usuario.",
+    match = ["git push --force-with-lease", "git push --force-with-lease origin feature"],
+)
+
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "prompt",
+    justification = "Reset hard puede destruir cambios locales; pide confirmacion explicita.",
+    match = ["git reset --hard", "git reset --hard HEAD~1"],
+)
+
+prefix_rule(
+    pattern = ["git", "checkout", "--"],
+    decision = "prompt",
+    justification = "Checkout de cambios puede descartar trabajo ajeno; pide confirmacion explicita.",
+    match = ["git checkout -- file.txt"],
+)
+
+prefix_rule(
+    pattern = ["git", "clean"],
+    decision = "prompt",
+    justification = "Git clean puede borrar archivos no trackeados; pide confirmacion explicita.",
+    match = ["git clean -fd", "git clean -fdx"],
+)
+
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "prompt",
+    justification = "Borrado recursivo requiere confirmacion explicita; prefiere trash si existe.",
+    match = ["rm -rf build", "rm -rf /tmp/foo"],
+)
+
+prefix_rule(
+    pattern = ["rm", "-fr"],
+    decision = "prompt",
+    justification = "Borrado recursivo requiere confirmacion explicita; prefiere trash si existe.",
+    match = ["rm -fr build"],
+)

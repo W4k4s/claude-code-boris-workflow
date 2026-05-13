@@ -36,6 +36,11 @@ Sustituye o amplia la seccion "Perfil" con tus datos. El resto puedes dejarlo ta
 - `code-architect`: disena features complejas, refactors grandes y analiza trade-offs.
 - No ejecutes subagentes en paralelo sobre el mismo working tree si van a editar archivos; usa worktrees separados.
 
+## Skills Boris
+- Usa skills `boris-*` para workflows reutilizables: `boris-grill`, `boris-review-changes`, `boris-quick-commit`, `boris-commit-push-pr`, `boris-techdebt`, `boris-worktree` y `boris-cierre-sesion`.
+- Invocalos explicitamente cuando el usuario pida esos flujos o cuando encajen por descripcion.
+- Aunque un skill describa un commit, push o borrado, pide confirmacion explicita antes de ejecutar acciones destructivas o externas.
+
 ## Flujo Recomendado
 - Tarea simple: implementa directamente con el cambio minimo correcto.
 - Tarea media: discovery, plan, review del plan si aplica, implementacion, verificacion y review del diff.

@@ -4,81 +4,75 @@ Instrucciones para un agente que este instalando este workflow Boris multi-tool 
 
 ## Objetivo
 
-Instalar metodologia, agentes, comandos y guardrails globales para Claude Code, Codex y OpenCode sin pisar configuracion existente sin aviso.
+Instalar metodologia, agentes, workflows reutilizables y guardrails globales para Claude Code, Codex y OpenCode sin pisar configuracion existente sin aviso.
 
-Destinos:
+El usuario puede pedir una sola herramienta o todas:
 
-- Claude Code: `~/.claude/`
-- Codex: `~/.codex/`
-- OpenCode: `~/.config/opencode/`
+- `--claude`: Claude Code en `~/.claude/`
+- `--codex`: Codex en `~/.codex/` y skills en `~/.agents/skills/`
+- `--opencode`: OpenCode en `~/.config/opencode/`
+- `--all`: todas las anteriores, comportamiento por defecto
 
-## Pasos
+## Instalacion Recomendada
 
-1. Clonar el repo en un directorio temporal:
+Clona el repo y ejecuta el instalador con la seleccion adecuada:
 
 ```bash
 git clone https://github.com/W4k4s/claude-code-boris-workflow.git /tmp/boris-workflow
+/tmp/boris-workflow/install.sh --all
 ```
 
-2. Asegurar que existen los directorios globales:
+Para instalar solo una herramienta:
 
 ```bash
-mkdir -p ~/.claude/agents ~/.claude/commands
-mkdir -p ~/.codex/agents
-mkdir -p ~/.config/opencode/agents ~/.config/opencode/commands
+/tmp/boris-workflow/install.sh --claude
+/tmp/boris-workflow/install.sh --codex
+/tmp/boris-workflow/install.sh --opencode
 ```
 
-3. Detectar colisiones antes de copiar.
+## Politica De Colisiones
 
-Para cada archivo de agents, commands y config:
+Para cada archivo que el instalador quiera copiar:
 
 - Si no existe en destino, copiar directamente.
 - Si existe y es identico, saltar.
 - Si existe y es distinto, mostrar `diff -u` y preguntar: sobreescribir, saltar o guardar backup `.bak` y sobreescribir.
 
-4. Instrucciones globales.
+Para instrucciones globales personales (`CLAUDE.md`, `AGENTS.md`), si ya existen y son distintas, no sobreescribir automaticamente. Mostrar diff y recomendar merge manual dejando intactas las reglas del usuario.
 
-Tratar estos ficheros como templates personales:
+## Que Copiar Por Herramienta
+
+Claude Code:
 
 - `global/CLAUDE.md` -> `~/.claude/CLAUDE.md`
-- `global/codex/AGENTS.md` -> `~/.codex/AGENTS.md`
-- `global/opencode/AGENTS.md` -> `~/.config/opencode/AGENTS.md`
-
-Si no existen, copiarlos. Si ya existen y son distintos, no sobreescribir automaticamente: mostrar donde esta el template y ofrecer merge guiado dejando intactas las reglas del usuario.
-
-5. Copiar agentes.
-
 - `global/agents/*.md` -> `~/.claude/agents/`
-- `global/codex/agents/*.toml` -> `~/.codex/agents/`
-- `global/opencode/agents/*.md` -> `~/.config/opencode/agents/`
-
-6. Copiar comandos.
-
 - `global/commands/*.md` -> `~/.claude/commands/`
+
+Codex:
+
+- `global/codex/AGENTS.md` -> `~/.codex/AGENTS.md`
+- `global/codex/agents/*.toml` -> `~/.codex/agents/`
+- `global/codex/rules/*.rules` -> `~/.codex/rules/`
+- `global/codex/skills/*/SKILL.md` -> `~/.agents/skills/*/SKILL.md`
+
+OpenCode:
+
+- `global/opencode/AGENTS.md` -> `~/.config/opencode/AGENTS.md`
+- `global/opencode/opencode.json` -> `~/.config/opencode/opencode.json`
+- `global/opencode/agents/*.md` -> `~/.config/opencode/agents/`
 - `global/opencode/commands/*.md` -> `~/.config/opencode/commands/`
 
-7. Copiar guardrails OpenCode.
+## Paridad Esperada
 
-- `global/opencode/opencode.json` -> `~/.config/opencode/opencode.json`
-
-Si ya existe, mostrar diff y pedir confirmacion antes de sobreescribir. No modificar modelos, providers, credenciales ni plugins fuera de ese fichero.
-
-8. Ajustar perfil si el usuario lo pide.
-
-Abrir en lectura los ficheros globales instalados y localizar la seccion de perfil. Preguntar nombre, GitHub, email, timezone, idioma y preferencias de modelo. Insertar solo en los ficheros que el usuario apruebe.
-
-9. Resumen final.
-
-Imprimir una tabla con:
-
-- Claude Code: instrucciones, agents y commands instalados, saltados o con conflicto.
-- Codex: instrucciones y agents instalados, saltados o con conflicto.
-- OpenCode: instrucciones, config, agents y commands instalados, saltados o con conflicto.
-- Proximo paso sugerido para probar el workflow.
-
-10. Limpieza.
-
-Borrar el clon temporal salvo que el usuario pida conservarlo.
+| Workflow | Claude Code | Codex | OpenCode |
+| --- | --- | --- | --- |
+| Review adversarial | `/grill` | `$boris-grill` | `/grill` |
+| Review cambios locales | `/review-changes` | `$boris-review-changes` | `/review-changes` |
+| Commit rapido | `/quick-commit` | `$boris-quick-commit` | `/quick-commit` |
+| Commit + push + PR | `/commit-push-pr` | `$boris-commit-push-pr` | `/commit-push-pr` |
+| Tech debt | `/techdebt` | `$boris-techdebt` | `/techdebt` |
+| Worktree paralelo | `/worktree` | `$boris-worktree` | `/worktree` |
+| Cierre sesion | `/cierre-sesion` | `$boris-cierre-sesion` | `/cierre-sesion` |
 
 ## Restricciones
 
@@ -89,10 +83,11 @@ Borrar el clon temporal salvo que el usuario pida conservarlo.
 - Nunca pushear a ningun repo propio del usuario sin peticion explicita.
 - Si una accion puede ser destructiva o externa, preguntar antes.
 
-## Uso Tipico
+## Resumen Final Esperado
 
-El usuario pega en Claude Code, Codex u OpenCode:
+Al terminar, imprime una tabla con:
 
-> Lee https://github.com/W4k4s/claude-code-boris-workflow - especialmente AGENT-INSTALL.md - e instala el workflow Boris multi-tool en mi maquina. Si ya tengo archivos con el mismo nombre en ~/.claude, ~/.codex o ~/.config/opencode, muestrame el diff antes de sobreescribir. No toques proyectos especificos, credenciales, plugins ni settings no cubiertos por el instalador. Al terminar, resume que instalaste y que dejaste intacto.
-
-El agente sigue los pasos de arriba.
+- Claude Code: instrucciones, agents y commands instalados, saltados o con conflicto.
+- Codex: instrucciones, agents, skills y rules instalados, saltados o con conflicto.
+- OpenCode: instrucciones, config, agents y commands instalados, saltados o con conflicto.
+- Proximo paso sugerido para probar el workflow.

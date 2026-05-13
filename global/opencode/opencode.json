@@ -3,7 +3,15 @@
   "share": "manual",
   "permission": {
     "edit": "ask",
-    "bash": "ask",
+    "bash": {
+      "*": "ask",
+      "git push --force*": "deny",
+      "git reset --hard*": "ask",
+      "git checkout --*": "ask",
+      "git clean*": "ask",
+      "rm -rf*": "ask",
+      "rm -fr*": "ask"
+    },
     "external_directory": "ask"
   }
 }
