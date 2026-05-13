@@ -10,6 +10,11 @@ Workflow global multi-tool basado en la metodologia de Boris Cherny para usar un
 
 Puedes instalarlo para una sola herramienta o para todas.
 
+## Documentacion
+
+- [Guia de buen uso](GUIA-USO.md): como trabajar correctamente con Claude Code, Codex y OpenCode usando este workflow.
+- [AGENT-INSTALL](AGENT-INSTALL.md): instrucciones para que un agente instale el workflow de forma segura.
+
 ## Instalacion
 
 ### Opcion 1 - Agentica Recomendada
