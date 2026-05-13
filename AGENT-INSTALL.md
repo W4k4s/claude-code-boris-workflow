@@ -38,7 +38,7 @@ For every file the installer wants to copy:
 - If it exists and is identical, skip it.
 - If it exists and is different, show `diff -u` and ask whether to overwrite, skip, or create a `.bak` backup and overwrite.
 
-For personal global instruction files (`CLAUDE.md`, `AGENTS.md`), if they already exist and differ, do not overwrite automatically. Show the diff and recommend a manual merge while preserving the user's existing rules.
+For personal global instruction files (`CLAUDE.md`, `AGENTS.md`) and OpenCode config (`opencode.json`), if they already exist and differ, do not overwrite automatically. Show the diff and recommend a manual merge while preserving the user's existing rules, providers, models, and local settings.
 
 ## What To Copy Per Tool
 
@@ -78,7 +78,7 @@ OpenCode:
 
 - Never overwrite a different existing file without showing a diff and receiving confirmation.
 - Never modify credentials, auth files, histories, caches, sessions, or logs.
-- Never modify `~/.claude/settings.json`, `~/.codex/config.toml`, providers, plugins, or keys unless explicitly requested.
+- Never modify `~/.claude/settings.json`, `~/.codex/config.toml`, existing `~/.config/opencode/opencode.json` providers/models, plugins, or keys unless explicitly requested.
 - Never touch project-specific files, `.claude/projects/`, `.codex/sessions/`, or other state directories.
 - Never push to any user-owned repo unless explicitly requested.
 - If an action can be destructive or external, ask first.

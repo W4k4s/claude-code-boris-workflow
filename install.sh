@@ -206,7 +206,7 @@ install_opencode_files() {
 
     echo
     echo "${bold}OpenCode config${reset}"
-    copy_one "$SRC/opencode/opencode.json" "$OPENCODE_DEST/opencode.json" "~/.config/opencode/opencode.json"
+    copy_template_only "$SRC/opencode/opencode.json" "$OPENCODE_DEST/opencode.json" "~/.config/opencode/opencode.json"
 
     echo
     echo "${bold}OpenCode AGENTS.md global${reset}"

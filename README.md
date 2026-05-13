@@ -92,7 +92,7 @@ Test a local checkout without cloning `main` from GitHub:
 BORIS_WORKFLOW_SRC="$PWD" ./install.sh --all
 ```
 
-The installer only copies global workflow files. If a destination file already exists and differs, it shows a diff and asks whether to overwrite, skip, or back up and overwrite.
+The installer only copies global workflow files. If an agent/command destination file already exists and differs, it shows a diff and asks whether to overwrite, skip, or back up and overwrite. Personal instruction files and `opencode.json` are never overwritten automatically; merge the shown diff manually so existing providers and local settings are preserved.
 
 ## Agentic Install Prompt
 
