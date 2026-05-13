@@ -2,6 +2,10 @@
 
 Workflow global multi-tool basado en la metodologia de Boris Cherny para usar una misma forma de trabajar en Claude Code, Codex y OpenCode.
 
+**Empieza aqui si eres usuario:** [Guia de buen uso](GUIA-USO.md)
+
+La guia explica desde cero como trabajar con estas herramientas, que significan los terminos principales y que flujo seguir para no romper el repo ni perder contexto.
+
 - **Plan primero** en tareas no triviales.
 - **Agentes especializados** (`staff-reviewer`, `code-simplifier`, `code-architect`) para aislar tareas sin ensuciar el contexto principal.
 - **Workflows reutilizables** adaptados a cada herramienta: commands en Claude/OpenCode y skills en Codex.
@@ -12,7 +16,7 @@ Puedes instalarlo para una sola herramienta o para todas.
 
 ## Documentacion
 
-- [Guia de buen uso](GUIA-USO.md): como trabajar correctamente con Claude Code, Codex y OpenCode usando este workflow.
+- [Guia de buen uso](GUIA-USO.md): guia practica para usuarios, con ejemplos, glosario y flujos recomendados.
 - [AGENT-INSTALL](AGENT-INSTALL.md): instrucciones para que un agente instale el workflow de forma segura.
 
 ## Instalacion
