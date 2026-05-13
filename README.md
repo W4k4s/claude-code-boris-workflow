@@ -23,6 +23,18 @@
   <img alt="Guardrails" src="https://img.shields.io/badge/guardrails-enabled-16a34a.svg" />
 </p>
 
+<p align="center">
+  <a href="USER-GUIDE.md"><img alt="Start here: User Guide" src="https://img.shields.io/badge/start%20here-User%20Guide-0f172a?style=for-the-badge" /></a>
+  <a href="GUIA-USO.md"><img alt="Guía en español" src="https://img.shields.io/badge/espa%C3%B1ol-Gu%C3%ADa%20de%20uso-c026d3?style=for-the-badge" /></a>
+</p>
+
+<table>
+  <tr>
+    <td><strong>New to AI coding workflows?</strong><br />Start with the guide before installing anything. It explains the terms, the safe workflow, when to plan, when to verify, and how to avoid losing context or overwriting work.</td>
+    <td><strong>Recommended path</strong><br /><a href="USER-GUIDE.md">Read the User Guide</a><br /><a href="GUIA-USO.md">Leer la guía en español</a><br /><a href="AGENT-INSTALL.md">Then install with an agent</a></td>
+  </tr>
+</table>
+
 ---
 
 ## What This Is
