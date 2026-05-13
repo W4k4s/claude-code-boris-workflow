@@ -1,76 +1,127 @@
 # claude-code-boris-workflow
 
-Workflow global para Claude Code basado en la metodología de Boris Cherny (creador de Claude Code):
+Workflow global multi-tool basado en la metodologia de Boris Cherny para usar una misma forma de trabajar en Claude Code, Codex y OpenCode:
 
-- **Plan mode primero** en tareas no triviales.
-- **Subagents** (`staff-reviewer`, `code-simplifier`, `code-architect`) para aislar tareas sin ensuciar el contexto principal.
-- **Commands globales** (`/grill`, `/techdebt`, `/commit-push-pr`, etc.) para operaciones recurrentes.
-- **Auto-mejora**: cuando el agente falla, se actualiza `CLAUDE.md` con una regla para que no vuelva a pasar.
+- **Plan primero** en tareas no triviales.
+- **Agentes especializados** (`staff-reviewer`, `code-simplifier`, `code-architect`) para aislar tareas sin ensuciar el contexto principal.
+- **Comandos globales** para operaciones recurrentes y consultas cruzadas entre herramientas.
+- **Guardrails globales**: no force-push sin confirmacion, no secretos en commits, no acciones externas sin permiso.
+- **Auto-mejora**: cuando el agente falla, se actualizan las instrucciones globales o del proyecto con una regla concreta.
 
-Se instala una sola vez en `~/.claude/` y queda disponible para **todos** tus proyectos Claude Code (abras donde abras).
+Se instala una sola vez y queda disponible para todos tus proyectos:
 
-## Instalación
+- Claude Code: `~/.claude/`
+- Codex: `~/.codex/`
+- OpenCode: `~/.config/opencode/`
 
-### Opción 1 · Agéntica (recomendada)
-Abre Claude Code en cualquier directorio y pega este prompt:
+## Instalacion
+
+### Opcion 1 - Agentica Recomendada
+Abre Claude Code, Codex u OpenCode en cualquier directorio y pega este prompt:
 
 ```
-Lee https://github.com/W4k4s/claude-code-boris-workflow — especialmente AGENT-INSTALL.md — y aplícalo en mi Claude Code.
-Si ya tengo archivos en ~/.claude/agents/ o ~/.claude/commands/ con el mismo nombre, muéstramelos antes de sobreescribir.
-Al terminar, haz un resumen de qué instalaste y qué dejaste intacto.
+Lee https://github.com/W4k4s/claude-code-boris-workflow - especialmente AGENT-INSTALL.md - e instala el workflow Boris multi-tool en mi maquina.
+Si ya tengo archivos con el mismo nombre en ~/.claude, ~/.codex o ~/.config/opencode, muestrame el diff antes de sobreescribir.
+No toques proyectos especificos, credenciales, plugins ni settings no cubiertos por el instalador.
+Al terminar, resume que instalaste y que dejaste intacto.
 ```
 
-Claude Code clonará el repo, revisará colisiones y te dejará los agents, commands y CLAUDE.md en su sitio.
+El agente clonara el repo, revisara colisiones y dejara las plantillas en su sitio.
 
-### Opción 2 · Bash (manual)
+### Opcion 2 - Bash Manual
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/W4k4s/claude-code-boris-workflow/main/install.sh | bash
 ```
 
-El script copia `global/*` a `~/.claude/` respetando lo que ya exista (pide confirmación en conflictos).
+El script instala solo archivos globales del workflow y pide confirmacion en conflictos. No toca proyectos especificos.
 
-### Opción 3 · Clonar y copiar manualmente
+Para probar una copia local del repo sin clonar `main` de GitHub:
+
+```bash
+BORIS_WORKFLOW_SRC="$PWD" ./install.sh
+```
+
+### Opcion 3 - Clonar Y Copiar Manualmente
 
 ```bash
 git clone https://github.com/W4k4s/claude-code-boris-workflow.git
 cd claude-code-boris-workflow
-cp -i -r global/agents   ~/.claude/
-cp -i -r global/commands ~/.claude/
-cp -i    global/CLAUDE.md ~/.claude/CLAUDE.md
+cp -i -r global/agents global/commands ~/.claude/
+cp -i global/CLAUDE.md ~/.claude/CLAUDE.md
+cp -i -r global/codex/agents ~/.codex/
+cp -i global/codex/AGENTS.md ~/.codex/AGENTS.md
+cp -i -r global/opencode/agents global/opencode/commands ~/.config/opencode/
+cp -i global/opencode/AGENTS.md global/opencode/opencode.json ~/.config/opencode/
 ```
 
-## Qué instala
+## Que Instala
+
+### Claude Code
 
 ```
 ~/.claude/
-├── CLAUDE.md                  # metodología + placeholder para tu perfil
+├── CLAUDE.md
 ├── agents/
-│   ├── staff-reviewer.md      # revisor escéptico pre-implementación
-│   ├── code-simplifier.md     # simplifica sin cambiar comportamiento
-│   └── code-architect.md      # diseño y refactors grandes
+│   ├── staff-reviewer.md
+│   ├── code-simplifier.md
+│   └── code-architect.md
 └── commands/
-    ├── grill.md               # review adversarial pre-ship
-    ├── review-changes.md      # diff review sin commit
-    ├── quick-commit.md        # commit rápido con mensaje auto
-    ├── commit-push-pr.md      # flujo completo hasta PR
-    ├── techdebt.md            # limpieza fin de sesión
-    ├── worktree.md            # git worktree paralelo
-    └── cierre-sesion.md       # cierre completo de sesión
+    ├── grill.md
+    ├── review-changes.md
+    ├── quick-commit.md
+    ├── commit-push-pr.md
+    ├── techdebt.md
+    ├── worktree.md
+    └── cierre-sesion.md
 ```
 
-Tras la instalación:
-1. Edita `~/.claude/CLAUDE.md` y rellena la sección "Tu perfil" con tus datos.
-2. Opcional: añade en "Errores conocidos cross-proyecto" reglas que hayas aprendido.
+### Codex
 
-## Filosofía
+```
+~/.codex/
+├── AGENTS.md
+└── agents/
+    ├── staff-reviewer.toml
+    ├── code-simplifier.toml
+    └── code-architect.toml
+```
 
-- **El contexto es caro.** Delega tareas pesadas o paralelizables a subagents.
-- **Plan antes que código.** Especialmente cuando la tarea tiene 3+ pasos.
-- **Verifica antes de cerrar.** Typecheck/lint/tests, dev server para UI. Si no lo has probado, no está hecho.
-- **El CLAUDE.md es memoria viva.** Cuando Claude se equivoque, fija la regla para que no se repita.
+### OpenCode
 
-Más detalle sobre la metodología en el canal de YouTube y blogs de Boris Cherny.
+```
+~/.config/opencode/
+├── AGENTS.md
+├── opencode.json
+├── agents/
+│   ├── staff-reviewer.md
+│   ├── code-simplifier.md
+│   └── code-architect.md
+└── commands/
+    ├── ask-claude.md
+    └── ask-codex.md
+```
+
+## Guardrails
+
+- El instalador no sobreescribe instrucciones globales existentes sin aviso.
+- En conflictos de agents, commands u `opencode.json`, muestra diff y pregunta si sobreescribir, saltar o guardar backup.
+- No modifica credenciales, auth files, plugins, historiales, sesiones ni proyectos especificos.
+- OpenCode queda con permisos globales conservadores: `edit`, `bash` y `external_directory` en `ask`.
+- Los comandos OpenCode `/ask-claude` y `/ask-codex` invocan otras herramientas solo tras confirmacion y con modos read-only/plan por defecto.
+
+## Tras La Instalacion
+
+1. Edita `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md` y `~/.config/opencode/AGENTS.md` para rellenar tu perfil.
+2. Anade reglas aprendidas en la seccion de errores conocidos cross-proyecto.
+3. Prueba un flujo simple en cada herramienta: planificar una tarea, revisar un diff o pedir una consulta read-only.
+
+## Filosofia
+
+- El contexto es caro: delega tareas pesadas o paralelizables a agentes.
+- Plan antes que codigo, especialmente en cambios de 3 o mas pasos.
+- Verifica antes de cerrar: typecheck, lint, tests, build o QA manual segun el proyecto.
+- Las instrucciones globales son memoria viva: cuando una herramienta se equivoque, fija la regla para que no se repita.
 
 ## Licencia
 
