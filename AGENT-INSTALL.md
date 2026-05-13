@@ -1,28 +1,28 @@
 # AGENT-INSTALL
 
-Instrucciones para un agente que este instalando este workflow Boris multi-tool en la maquina del usuario.
+Instructions for an agent installing this multi-tool Boris workflow on a user's machine.
 
-## Objetivo
+## Goal
 
-Instalar metodologia, agentes, workflows reutilizables y guardrails globales para Claude Code, Codex y OpenCode sin pisar configuracion existente sin aviso.
+Install global methodology, agents, reusable workflows, and guardrails for Claude Code, Codex, and OpenCode without overwriting existing configuration without notice.
 
-El usuario puede pedir una sola herramienta o todas:
+The user may request one tool or all of them:
 
-- `--claude`: Claude Code en `~/.claude/`
-- `--codex`: Codex en `~/.codex/` y skills en `~/.agents/skills/`
-- `--opencode`: OpenCode en `~/.config/opencode/`
-- `--all`: todas las anteriores, comportamiento por defecto
+- `--claude`: Claude Code under `~/.claude/`
+- `--codex`: Codex under `~/.codex/` and skills under `~/.agents/skills/`
+- `--opencode`: OpenCode under `~/.config/opencode/`
+- `--all`: all of the above, default behavior
 
-## Instalacion Recomendada
+## Recommended Installation
 
-Clona el repo y ejecuta el instalador con la seleccion adecuada:
+Clone the repo and run the installer with the right selection:
 
 ```bash
 git clone https://github.com/W4k4s/claude-code-boris-workflow.git /tmp/boris-workflow
 /tmp/boris-workflow/install.sh --all
 ```
 
-Para instalar solo una herramienta:
+To install only one tool:
 
 ```bash
 /tmp/boris-workflow/install.sh --claude
@@ -30,17 +30,17 @@ Para instalar solo una herramienta:
 /tmp/boris-workflow/install.sh --opencode
 ```
 
-## Politica De Colisiones
+## Conflict Policy
 
-Para cada archivo que el instalador quiera copiar:
+For every file the installer wants to copy:
 
-- Si no existe en destino, copiar directamente.
-- Si existe y es identico, saltar.
-- Si existe y es distinto, mostrar `diff -u` y preguntar: sobreescribir, saltar o guardar backup `.bak` y sobreescribir.
+- If it does not exist in the destination, copy it directly.
+- If it exists and is identical, skip it.
+- If it exists and is different, show `diff -u` and ask whether to overwrite, skip, or create a `.bak` backup and overwrite.
 
-Para instrucciones globales personales (`CLAUDE.md`, `AGENTS.md`), si ya existen y son distintas, no sobreescribir automaticamente. Mostrar diff y recomendar merge manual dejando intactas las reglas del usuario.
+For personal global instruction files (`CLAUDE.md`, `AGENTS.md`), if they already exist and differ, do not overwrite automatically. Show the diff and recommend a manual merge while preserving the user's existing rules.
 
-## Que Copiar Por Herramienta
+## What To Copy Per Tool
 
 Claude Code:
 
@@ -62,32 +62,32 @@ OpenCode:
 - `global/opencode/agents/*.md` -> `~/.config/opencode/agents/`
 - `global/opencode/commands/*.md` -> `~/.config/opencode/commands/`
 
-## Paridad Esperada
+## Expected Parity
 
 | Workflow | Claude Code | Codex | OpenCode |
 | --- | --- | --- | --- |
-| Review adversarial | `/grill` | `$boris-grill` | `/grill` |
-| Review cambios locales | `/review-changes` | `$boris-review-changes` | `/review-changes` |
-| Commit rapido | `/quick-commit` | `$boris-quick-commit` | `/quick-commit` |
+| Adversarial review | `/grill` | `$boris-grill` | `/grill` |
+| Review local changes | `/review-changes` | `$boris-review-changes` | `/review-changes` |
+| Quick commit | `/quick-commit` | `$boris-quick-commit` | `/quick-commit` |
 | Commit + push + PR | `/commit-push-pr` | `$boris-commit-push-pr` | `/commit-push-pr` |
-| Tech debt | `/techdebt` | `$boris-techdebt` | `/techdebt` |
-| Worktree paralelo | `/worktree` | `$boris-worktree` | `/worktree` |
-| Cierre sesion | `/cierre-sesion` | `$boris-cierre-sesion` | `/cierre-sesion` |
+| Tech debt cleanup | `/techdebt` | `$boris-techdebt` | `/techdebt` |
+| Parallel worktree | `/worktree` | `$boris-worktree` | `/worktree` |
+| Session close | `/cierre-sesion` | `$boris-cierre-sesion` | `/cierre-sesion` |
 
-## Restricciones
+## Restrictions
 
-- Nunca sobreescribir un archivo distinto sin mostrar diff y recibir confirmacion.
-- Nunca modificar credenciales, auth files, histories, caches, sesiones o logs.
-- Nunca modificar `~/.claude/settings.json`, `~/.codex/config.toml`, providers, plugins o keys salvo peticion explicita.
-- Nunca tocar proyectos especificos, `.claude/projects/`, `.codex/sessions/` ni otros directorios de estado.
-- Nunca pushear a ningun repo propio del usuario sin peticion explicita.
-- Si una accion puede ser destructiva o externa, preguntar antes.
+- Never overwrite a different existing file without showing a diff and receiving confirmation.
+- Never modify credentials, auth files, histories, caches, sessions, or logs.
+- Never modify `~/.claude/settings.json`, `~/.codex/config.toml`, providers, plugins, or keys unless explicitly requested.
+- Never touch project-specific files, `.claude/projects/`, `.codex/sessions/`, or other state directories.
+- Never push to any user-owned repo unless explicitly requested.
+- If an action can be destructive or external, ask first.
 
-## Resumen Final Esperado
+## Expected Final Summary
 
-Al terminar, imprime una tabla con:
+At the end, print a table with:
 
-- Claude Code: instrucciones, agents y commands instalados, saltados o con conflicto.
-- Codex: instrucciones, agents, skills y rules instalados, saltados o con conflicto.
-- OpenCode: instrucciones, config, agents y commands instalados, saltados o con conflicto.
-- Proximo paso sugerido para probar el workflow.
+- Claude Code: instructions, agents, and commands installed, skipped, or conflicted.
+- Codex: instructions, agents, skills, and rules installed, skipped, or conflicted.
+- OpenCode: instructions, config, agents, and commands installed, skipped, or conflicted.
+- Suggested next step to test the workflow.
