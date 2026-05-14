@@ -8,10 +8,12 @@ Install global methodology, agents, reusable workflows, and guardrails for Claud
 
 The user may request one tool or all of them:
 
-- `--claude`: Claude Code under `~/.claude/`
+- `--claude`: Claude Code under `~/.claude/`, including skills under `~/.claude/skills/`
 - `--codex`: Codex under `~/.codex/` and skills under `~/.agents/skills/`
 - `--opencode`: OpenCode under `~/.config/opencode/`
 - `--all`: all of the above, default behavior
+
+PowerShell equivalents are `-Claude`, `-Codex`, `-OpenCode`, and `-All`.
 
 ## Recommended Installation
 
@@ -22,6 +24,14 @@ git clone https://github.com/W4k4s/claude-code-boris-workflow.git /tmp/boris-wor
 /tmp/boris-workflow/install.sh --all
 ```
 
+On native Windows, use PowerShell so desktop apps get files under the Windows user profile instead of WSL:
+
+```powershell
+$dir = Join-Path $env:TEMP ("boris-workflow-" + [guid]::NewGuid())
+git clone https://github.com/W4k4s/claude-code-boris-workflow.git $dir
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $dir "install.ps1") -All
+```
+
 To install only one tool:
 
 ```bash
@@ -29,6 +39,45 @@ To install only one tool:
 /tmp/boris-workflow/install.sh --codex
 /tmp/boris-workflow/install.sh --opencode
 ```
+
+On native Windows:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Claude
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Codex
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -OpenCode
+```
+
+## Windows Native Vs WSL
+
+Install into the environment that runs the agent:
+
+- Claude Code CLI in WSL reads the WSL home, for example `/home/<user>/.claude`.
+- Claude Desktop Code on Windows is a native Windows app and should be treated as a separate install under `%USERPROFILE%\.claude`.
+- Codex CLI in WSL reads WSL `~/.codex` and `~/.agents/skills`.
+- Codex App on Windows reads native Windows config unless its agent is explicitly configured to run inside WSL.
+- OpenCode uses its own config directory and has been validated through normal `~/.config/opencode` command usage.
+
+Do not copy whole config directories between WSL and Windows blindly. They can contain auth state, MCP paths, shell-specific commands, and non-portable absolute paths. Prefer running the installer separately in each target environment.
+
+## Surface Differences
+
+Do not describe agents, commands, and skills as the same thing:
+
+| Concept | Claude Code | Codex | OpenCode |
+| --- | --- | --- | --- |
+| Global instructions | `CLAUDE.md` | `AGENTS.md` | `AGENTS.md` |
+| Agents | `~/.claude/agents/*.md` | `~/.codex/agents/*.toml` | `~/.config/opencode/agents/*.md` |
+| Workflows | `~/.claude/skills/*` plus legacy `~/.claude/commands/*.md` | `~/.agents/skills/boris-*` | `~/.config/opencode/commands/*.md` |
+| User invocation | `/grill` | `$boris-grill` | `/grill` |
+
+Important limitations:
+
+- Claude Desktop Code may expose installed filesystem workflows through the `/` menu even when they do not appear under **Customize > Skills**.
+- Claude legacy commands remain installed for compatibility, but `~/.claude/skills` is the modern package shape.
+- Codex App and CLI use `$boris-*` skills rather than global custom slash commands.
+- OpenCode commands are native OpenCode commands and are configured separately from Claude and Codex.
+- Agents are specialist assistants, not workflow launchers.
 
 ## Conflict Policy
 
@@ -38,7 +87,7 @@ For every file the installer wants to copy:
 - If it exists and is identical, skip it.
 - If it exists and is different, show `diff -u` and ask whether to overwrite, skip, or create a `.bak` backup and overwrite.
 
-For personal global instruction files (`CLAUDE.md`, `AGENTS.md`), if they already exist and differ, do not overwrite automatically. Show the diff and recommend a manual merge while preserving the user's existing rules.
+For personal global instruction files (`CLAUDE.md`, `AGENTS.md`) and OpenCode config (`opencode.json`), if they already exist and differ, do not overwrite automatically. Show the diff and recommend a manual merge while preserving the user's existing rules, providers, models, and local settings.
 
 ## What To Copy Per Tool
 
@@ -46,6 +95,7 @@ Claude Code:
 
 - `global/CLAUDE.md` -> `~/.claude/CLAUDE.md`
 - `global/agents/*.md` -> `~/.claude/agents/`
+- `global/skills/*` -> `~/.claude/skills/*`
 - `global/commands/*.md` -> `~/.claude/commands/`
 
 Codex:
@@ -53,7 +103,7 @@ Codex:
 - `global/codex/AGENTS.md` -> `~/.codex/AGENTS.md`
 - `global/codex/agents/*.toml` -> `~/.codex/agents/`
 - `global/codex/rules/*.rules` -> `~/.codex/rules/`
-- `global/codex/skills/*/SKILL.md` -> `~/.agents/skills/*/SKILL.md`
+- `global/codex/skills/*` -> `~/.agents/skills/*`
 
 OpenCode:
 
@@ -74,11 +124,34 @@ OpenCode:
 | Parallel worktree | `/worktree` | `$boris-worktree` | `/worktree` |
 | Session close | `/cierre-sesion` | `$boris-cierre-sesion` | `/cierre-sesion` |
 
+## Expected Verification
+
+After installing Claude on native Windows:
+
+- Check `%USERPROFILE%\.claude\skills\grill\SKILL.md` exists.
+- Restart Claude Desktop.
+- In the Code tab, type `/` and confirm `grill`, `review-changes`, `quick-commit`, and `cierre-sesion` appear.
+- Run `/quick-commit Estoy probando. No hagas commit; dime que checks harias y espera confirmacion.` and confirm it waits for explicit approval.
+
+After installing Codex on native Windows:
+
+- Check `%USERPROFILE%\.agents\skills\boris-grill\SKILL.md` exists.
+- Open Codex App with the Windows-native agent.
+- Type `$` and confirm `boris-grill`, `boris-review-changes`, and `boris-quick-commit` appear or are accepted.
+- Run `$boris-quick-commit Estoy probando. No hagas commit; dime que checks harias y espera confirmacion.` and confirm it waits for explicit approval.
+
+After installing OpenCode:
+
+- Confirm `~/.config/opencode/commands/grill.md` or `%USERPROFILE%\.config\opencode\commands\grill.md` exists.
+- Open OpenCode and invoke `/grill` or `/review-changes` in a test project.
+- Confirm permissions still ask before edits and shell commands according to `opencode.json`.
+
 ## Restrictions
 
 - Never overwrite a different existing file without showing a diff and receiving confirmation.
 - Never modify credentials, auth files, histories, caches, sessions, or logs.
-- Never modify `~/.claude/settings.json`, `~/.codex/config.toml`, providers, plugins, or keys unless explicitly requested.
+- Never modify `~/.claude/settings.json`, `~/.codex/config.toml`, existing `~/.config/opencode/opencode.json` providers/models, plugins, or keys unless explicitly requested.
+- Never copy WSL config directories into Windows native config directories, or the reverse, without explicitly reviewing secrets, auth state, MCP paths, and shell-specific commands.
 - Never touch project-specific files, `.claude/projects/`, `.codex/sessions/`, or other state directories.
 - Never push to any user-owned repo unless explicitly requested.
 - If an action can be destructive or external, ask first.
@@ -87,7 +160,7 @@ OpenCode:
 
 At the end, print a table with:
 
-- Claude Code: instructions, agents, and commands installed, skipped, or conflicted.
+- Claude Code: instructions, agents, skills, and commands installed, skipped, or conflicted.
 - Codex: instructions, agents, skills, and rules installed, skipped, or conflicted.
 - OpenCode: instructions, config, agents, and commands installed, skipped, or conflicted.
 - Suggested next step to test the workflow.

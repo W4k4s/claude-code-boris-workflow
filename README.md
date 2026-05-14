@@ -41,7 +41,7 @@
 
 This repo packages a global development workflow inspired by Boris Cherny's Claude Code methodology and adapts it to three local AI coding tools:
 
-- **Claude Code**: global `CLAUDE.md`, agents, and slash commands.
+- **Claude Code**: global `CLAUDE.md`, agents, skills, and legacy slash commands.
 - **Codex**: global `AGENTS.md`, custom agents, skills, and command safety rules.
 - **OpenCode**: global `AGENTS.md`, agents, commands, and conservative permissions.
 
@@ -55,7 +55,7 @@ The goal is not to install more tooling for the sake of it. The goal is to make 
 
 ## Why Use It
 
-- **One workflow across tools**: Claude Code commands, Codex skills, and OpenCode commands map to the same routines.
+- **One workflow across tools**: Claude Code skills/commands, Codex skills, and OpenCode commands map to the same routines.
 - **Safer defaults**: commits, pushes, destructive shell commands, and external actions require explicit intent.
 - **Reusable agents**: planning, architecture, and simplification are handled by focused assistants.
 - **Portable setup**: install everything or only the tool you use.
@@ -67,6 +67,14 @@ Install everything:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/W4k4s/claude-code-boris-workflow/main/install.sh | bash
+```
+
+Install from Windows PowerShell for native Windows desktop apps:
+
+```powershell
+$dir = Join-Path $env:TEMP ("boris-workflow-" + [guid]::NewGuid())
+git clone https://github.com/W4k4s/claude-code-boris-workflow.git $dir
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $dir "install.ps1") -All
 ```
 
 Install one tool only:
@@ -86,13 +94,22 @@ Available installer options:
 ./install.sh --opencode
 ```
 
+Windows PowerShell options:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -All
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Claude
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Codex
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -OpenCode
+```
+
 Test a local checkout without cloning `main` from GitHub:
 
 ```bash
 BORIS_WORKFLOW_SRC="$PWD" ./install.sh --all
 ```
 
-The installer only copies global workflow files. If a destination file already exists and differs, it shows a diff and asks whether to overwrite, skip, or back up and overwrite.
+The installer only copies global workflow files. If an agent, skill, command, or rule destination file already exists and differs, it shows a diff and asks whether to overwrite, skip, or back up and overwrite. Personal instruction files and `opencode.json` are never overwritten automatically; merge the shown diff manually so existing providers and local settings are preserved.
 
 ## Agentic Install Prompt
 
@@ -101,7 +118,7 @@ Open Claude Code, Codex, or OpenCode in any directory and paste:
 ```text
 Read https://github.com/W4k4s/claude-code-boris-workflow - especially AGENT-INSTALL.md - and install the Boris workflow for the tools I specify.
 If I do not specify a tool, install all of them: Claude Code, Codex, and OpenCode.
-If I already have files with the same name under ~/.claude, ~/.codex, ~/.agents/skills, or ~/.config/opencode, show me the diff before overwriting.
+If I already have files with the same name under ~/.claude, ~/.claude/skills, ~/.codex, ~/.agents/skills, or ~/.config/opencode, show me the diff before overwriting.
 Do not touch project-specific files, credentials, plugins, or settings that are not covered by the installer.
 At the end, summarize what you installed and what you left untouched.
 ```
@@ -110,9 +127,62 @@ At the end, summarize what you installed and what you left untouched.
 
 | Tool | Global instructions | Agents | Workflows | Guardrails |
 | --- | --- | --- | --- | --- |
-| Claude Code | `~/.claude/CLAUDE.md` | `~/.claude/agents/*.md` | `~/.claude/commands/*.md` | Existing Claude permission flow |
+| Claude Code | `~/.claude/CLAUDE.md` | `~/.claude/agents/*.md` | `~/.claude/skills/*` and legacy `~/.claude/commands/*.md` | Existing Claude permission flow |
 | Codex | `~/.codex/AGENTS.md` | `~/.codex/agents/*.toml` | `~/.agents/skills/boris-*` | `~/.codex/rules/boris-safety.rules` |
 | OpenCode | `~/.config/opencode/AGENTS.md` | `~/.config/opencode/agents/*.md` | `~/.config/opencode/commands/*.md` | `~/.config/opencode/opencode.json` |
+
+## Agents, Commands, And Skills
+
+The workflow uses each tool's native extension model instead of pretending all clients work the same way.
+
+| Concept | Claude Code | Codex | OpenCode | Notes |
+| --- | --- | --- | --- | --- |
+| Global instructions | `CLAUDE.md` | `AGENTS.md` | `AGENTS.md` | Loaded at session start to set behavior and guardrails. |
+| Specialized agents | Markdown agents in `~/.claude/agents` | TOML agents in `~/.codex/agents` | Markdown agents in `~/.config/opencode/agents` | Used for architecture, plan review, and simplification. |
+| User-invoked workflows | Skills in `~/.claude/skills`; legacy commands in `~/.claude/commands` | Skills in `~/.agents/skills` | Commands in `~/.config/opencode/commands` | Same workflow, different packaging. |
+| Invocation | `/grill`, `/quick-commit` | `$boris-grill`, `$boris-quick-commit` | `/grill`, `/quick-commit` | Codex skills use the `boris-` prefix to avoid collisions. |
+
+Limitations to know:
+
+- Claude Code custom commands are now treated like skills by Claude Code, but legacy `~/.claude/commands` files are still installed for compatibility.
+- Claude Desktop Code may show these workflows in the `/` menu without listing personal filesystem skills under **Customize > Skills**.
+- Codex App and Codex CLI use skills, not global custom slash commands. In the app, invoke them with `$boris-*` or by selecting the matching skill when available.
+- Agents are not the same thing as skills. Agents shape delegated specialist behavior; skills and commands are reusable workflows you invoke.
+- Desktop apps and WSL do not share config automatically. Install separately in the environment that runs the agent.
+
+## Desktop Apps, CLI, Windows, And WSL
+
+Install the workflow in the same environment that runs the agent. Windows native apps and WSL do not automatically share home directories or tool configuration.
+
+| Environment | Install with | Config location | Notes |
+| --- | --- | --- | --- |
+| Claude Code CLI in WSL/Linux/macOS | `install.sh --claude` | `~/.claude` | Best fit when your repo and toolchain live in Linux/WSL. |
+| Claude Desktop Code on Windows | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Claude` | `%USERPROFILE%\.claude` | Treat as a separate native Windows install. Restart Desktop after adding a new `skills` directory. |
+| Codex CLI in WSL/Linux/macOS | `install.sh --codex` | `~/.codex` and `~/.agents/skills` | Use this when the Codex agent runs inside WSL/Linux. |
+| Codex App on Windows | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Codex` | `%USERPROFILE%\.codex` and `%USERPROFILE%\.agents\skills` | If the app agent is switched to WSL, install inside WSL too or configure `CODEX_HOME` deliberately. |
+| OpenCode native config | `install.sh --opencode` or `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -OpenCode` | `~/.config/opencode` or `%USERPROFILE%\.config\opencode` | Keep provider/model settings when merging `opencode.json`. |
+
+If you installed Claude Code in WSL at `/home/<user>/.claude`, Claude Desktop on Windows should not be expected to see those skills automatically. Install the Windows target separately with `install.ps1` instead of copying the whole WSL `.claude` directory, because auth files, MCP paths, shell commands, and secrets may not be portable.
+
+To verify Claude Desktop Code after installation:
+
+1. Restart Claude Desktop completely.
+2. Open the Code tab in a local project.
+3. Type `/` and confirm `grill`, `review-changes`, `quick-commit`, and `cierre-sesion` appear.
+4. Run `/quick-commit Estoy probando. No hagas commit; dime que checks harias y espera confirmacion.` and confirm it does not commit without explicit approval.
+
+Personal filesystem skills may not appear in the desktop **Customize > Skills** view even when they are installed correctly. Treat the slash menu and actual command behavior as the source of truth.
+
+The validated behavior for Claude Desktop Code on Windows is: files install under `%USERPROFILE%\.claude`, workflows appear in the `/` menu, `/grill` can inspect branch state, `/review-changes` can run a local review, and `/quick-commit` waits for explicit confirmation before committing.
+
+To verify Codex App on Windows after installation:
+
+1. Open Codex App with the Windows-native agent.
+2. Open a local project.
+3. Type `$` in the composer and confirm `boris-grill`, `boris-review-changes`, and `boris-quick-commit` appear.
+4. Run `$boris-quick-commit Estoy probando. No hagas commit; dime que checks harias y espera confirmacion.` and confirm it does not commit without explicit approval.
+
+The validated behavior for Codex App on Windows is: files install under `%USERPROFILE%\.codex` and `%USERPROFILE%\.agents\skills`, `$boris-quick-commit` is recognized, and it waits for explicit confirmation before committing.
 
 ## Workflow Parity
 
@@ -133,6 +203,7 @@ global/
 ├── CLAUDE.md
 ├── agents/
 ├── commands/
+├── skills/
 ├── codex/
 │   ├── AGENTS.md
 │   ├── agents/

@@ -4,13 +4,19 @@
   "permission": {
     "edit": "ask",
     "bash": {
-      "*": "ask",
+      "git push --force-with-lease*": "deny",
       "git push --force*": "deny",
+      "git push *--force-with-lease*": "deny",
+      "git push *--force*": "deny",
       "git reset --hard*": "ask",
       "git checkout --*": "ask",
       "git clean*": "ask",
+      "rm --recursive*": "ask",
+      "rm -R*": "ask",
+      "rm -r*": "ask",
       "rm -rf*": "ask",
-      "rm -fr*": "ask"
+      "rm -fr*": "ask",
+      "*": "ask"
     },
     "external_directory": "ask"
   }

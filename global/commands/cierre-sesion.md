@@ -40,7 +40,9 @@ NO guardes: patrones de código, estructura del repo, fixes de bugs concretos,
 resúmenes de actividad, contenido ya en CLAUDE.md, ni estado efímero. Eso lo
 da `git log` o el propio código. Si dudas, NO guardes.
 
-Actualiza `MEMORY.md` con una línea índice por cada memoria nueva (<150 chars).
+Si detectas memorias nuevas, proponlas con una linea indice por memoria (<150 chars)
+y pide confirmacion antes de escribirlas. No crees ni actualices `MEMORY.md` si el
+proyecto no lo usa ya o si el usuario no lo aprueba explicitamente.
 
 ## 4. Tech debt y limpieza
 Invoca el skill `techdebt`: detecta código duplicado o muerto introducido en la

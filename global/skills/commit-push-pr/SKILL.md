@@ -1,5 +1,7 @@
 ---
-description: Commit, push y abre PR con el cambio actual
+name: commit-push-pr
+description: Commit, push y abre PR con el cambio actual cuando el usuario lo pide explicitamente.
+disable-model-invocation: true
 ---
 
 Ejecuta el flujo completo hasta Pull Request, parando ante cualquier problema.

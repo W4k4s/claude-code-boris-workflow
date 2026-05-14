@@ -75,7 +75,11 @@ A command inside Claude Code or OpenCode that runs a workflow recipe. Examples: 
 
 ### Skill
 
-Codex's version of a reusable recipe. Examples: `$boris-grill`, `$boris-quick-commit`.
+A reusable workflow packaged as a folder with `SKILL.md`. Claude Code invokes them with `/name`. Codex usually invokes them with `$boris-name`.
+
+### Agent Vs Skill
+
+An agent is a specialist you delegate to, such as architecture or plan review. A skill is a workflow you invoke, such as reviewing changes or preparing a commit.
 
 ### Worktree
 
@@ -107,17 +111,74 @@ There is no universally best tool. The decision depends on how you want to work.
 
 | Case | Recommended tool | Why |
 | --- | --- | --- |
-| I want a strong local implementation session | Claude Code | Great interactive workflow, commands, and subagents |
+| I want a strong local implementation session | Claude Code | Great interactive workflow, skills/commands, and subagents |
 | I want sandboxing and skills from the terminal | Codex | Good permission control, subagents, and `$boris-*` skills |
 | I want to alternate plan/build with conservative permissions | OpenCode | Good agent system and global commands |
 | I want to ask another model without switching tools | OpenCode | It includes `/ask-claude` and `/ask-codex` |
 | I want to work in parallel without overwriting changes | Any tool with a worktree | Each tool works in its own folder |
 
+## Desktop Apps, CLI, Windows, And WSL
+
+Practical rule: install the workflow in the same environment that runs the agent.
+
+Native Windows and WSL do not automatically share the same `$HOME` or configuration:
+
+| If you use... | Install in... | Expected path |
+| --- | --- | --- |
+| Claude Code CLI inside WSL | WSL | `/home/<user>/.claude` |
+| Claude Desktop, Code tab, on Windows | Native Windows | `C:\Users\<user>\.claude` |
+| Codex CLI inside WSL | WSL | `/home/<user>/.codex` and `/home/<user>/.agents/skills` |
+| Codex App on Windows with the Windows agent | Native Windows | `C:\Users\<user>\.codex` and `C:\Users\<user>\.agents\skills` |
+
+If you installed inside WSL and then open Claude Desktop on Windows, it is normal not to see the same skills or agents. Do not copy the whole WSL `.claude` directory into Windows blindly: it may contain auth state, Linux paths, MCP config, or shell-specific commands. Run the Windows installer for the native app instead:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Claude
+```
+
+For Claude Desktop Code, the workflows are installed as skills in `~/.claude/skills` and also as legacy commands in `~/.claude/commands`. If the `skills` folder did not exist before, restart the app.
+
+The important check is whether the workflows are invocable. In our Windows Desktop validation, Claude Desktop Code loaded the workflows from the `/` menu even though personal filesystem skills did not necessarily appear under **Customize > Skills**.
+
+To verify Claude Desktop:
+
+1. Close and reopen Claude Desktop.
+2. Open the Code tab and select a local project.
+3. Type `/` and confirm `grill`, `review-changes`, `quick-commit`, and `cierre-sesion` appear.
+4. Try `/quick-commit I am testing. Do not commit; tell me what checks you would run and wait for confirmation.` and confirm it does not commit without explicit approval.
+
+Personal filesystem skills may not appear under **Customize > Skills** even when installed correctly. The practical check is that they appear in the `/` menu and behave correctly when invoked.
+
+To verify Codex App on Windows:
+
+1. Open Codex App with the Windows-native agent.
+2. Open a local project.
+3. Type `$` and confirm `boris-grill`, `boris-review-changes`, and `boris-quick-commit` appear.
+4. Try `$boris-quick-commit I am testing. Do not commit; tell me what checks you would run and wait for confirmation.` and confirm it does not commit without explicit approval.
+
+OpenCode does not need a separate desktop/CLI distinction in this repo: it uses its own config under `~/.config/opencode`, agents under `agents/`, commands under `commands/`, and permissions in `opencode.json`. The practical check is that `/grill`, `/review-changes`, and `/quick-commit` work and permissions ask where expected.
+
+## Commands, Skills, And Agents
+
+| Tool | Global instructions | Agents | Invocable workflows | How you invoke them |
+| --- | --- | --- | --- | --- |
+| Claude Code CLI/Desktop | `~/.claude/CLAUDE.md` | `~/.claude/agents/*.md` | `~/.claude/skills/*` and legacy `~/.claude/commands/*.md` | `/grill`, `/quick-commit` |
+| Codex CLI/App | `~/.codex/AGENTS.md` | `~/.codex/agents/*.toml` | `~/.agents/skills/boris-*` | `$boris-grill`, `$boris-quick-commit` |
+| OpenCode | `~/.config/opencode/AGENTS.md` | `~/.config/opencode/agents/*.md` | `~/.config/opencode/commands/*.md` | `/grill`, `/quick-commit` |
+
+Limitations and differences:
+
+- Claude Code still supports legacy commands, but the modern format is a skill under `~/.claude/skills`.
+- Claude Desktop Code may show workflows in `/` without listing them under **Customize > Skills**.
+- Codex does not use global custom slash commands for this workflow; it uses `$boris-*` skills.
+- Agents are not workflow buttons. They are specialists for delegated work and do not replace `/grill` or `$boris-grill`.
+- Native Windows and WSL are separate installs. If you use both, install the workflow in both.
+
 ## Claude Code In Practice
 
-Claude Code installs instructions in `~/.claude/CLAUDE.md`, agents in `~/.claude/agents`, and commands in `~/.claude/commands`.
+Claude Code installs instructions in `~/.claude/CLAUDE.md`, agents in `~/.claude/agents`, skills in `~/.claude/skills`, and legacy commands in `~/.claude/commands`.
 
-Important commands:
+Important skills/commands:
 
 | Command | What it does | When to use it |
 | --- | --- | --- |

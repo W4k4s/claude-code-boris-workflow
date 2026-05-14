@@ -48,3 +48,24 @@ prefix_rule(
     justification = "Borrado recursivo requiere confirmacion explicita; prefiere trash si existe.",
     match = ["rm -fr build"],
 )
+
+prefix_rule(
+    pattern = ["rm", "-r"],
+    decision = "prompt",
+    justification = "Borrado recursivo requiere confirmacion explicita; prefiere trash si existe.",
+    match = ["rm -r build", "rm -r -f build"],
+)
+
+prefix_rule(
+    pattern = ["rm", "-R"],
+    decision = "prompt",
+    justification = "Borrado recursivo requiere confirmacion explicita; prefiere trash si existe.",
+    match = ["rm -R build"],
+)
+
+prefix_rule(
+    pattern = ["rm", "--recursive"],
+    decision = "prompt",
+    justification = "Borrado recursivo requiere confirmacion explicita; prefiere trash si existe.",
+    match = ["rm --recursive build"],
+)
