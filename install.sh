@@ -6,6 +6,7 @@ set -euo pipefail
 
 REPO_URL="https://github.com/W4k4s/claude-code-boris-workflow.git"
 CLAUDE_DEST="${CLAUDE_HOME:-$HOME/.claude}"
+CLAUDE_SKILLS_DEST="${CLAUDE_SKILLS_HOME:-$CLAUDE_DEST/skills}"
 CODEX_DEST="${CODEX_HOME:-$HOME/.codex}"
 CODEX_SKILLS_DEST="${CODEX_SKILLS_HOME:-$HOME/.agents/skills}"
 OPENCODE_DEST="${OPENCODE_CONFIG_DIR:-$HOME/.config/opencode}"
@@ -26,7 +27,7 @@ Usage: ./install.sh [--all] [--claude] [--codex] [--opencode]
 
 Options:
   --all       Install Claude Code, Codex and OpenCode workflow files (default)
-  --claude    Install only Claude Code files under ~/.claude
+  --claude    Install only Claude Code files under ~/.claude, including ~/.claude/skills
   --codex     Install only Codex files under ~/.codex and ~/.agents/skills
   --opencode  Install only OpenCode files under ~/.config/opencode
   -h, --help  Show this help
@@ -63,6 +64,7 @@ fi
 
 echo "${bold}claude-code-boris-workflow installer${reset}"
 echo "Claude Code:  $CLAUDE_DEST"
+echo "Claude skills: $CLAUDE_SKILLS_DEST"
 echo "Codex:        $CODEX_DEST"
 echo "Codex skills: $CODEX_SKILLS_DEST"
 echo "OpenCode:     $OPENCODE_DEST"
@@ -87,6 +89,8 @@ copy_template_only() {
     local dest_file="$2"
     local label="$3"
 
+    mkdir -p "$(dirname "$dest_file")"
+
     if [[ ! -e "$dest_file" ]]; then
         cp "$src_file" "$dest_file"
         echo "  + instalado: $label"
@@ -109,6 +113,8 @@ copy_one() {
     local dest_file="$2"
     local label="$3"
 
+    mkdir -p "$(dirname "$dest_file")"
+
     if [[ ! -e "$dest_file" ]]; then
         cp "$src_file" "$dest_file"
         echo "  + instalado: $label"
@@ -128,7 +134,7 @@ copy_one() {
     read -r -p "[o]verwrite / [s]kip / [b]ackup (.bak) y sobreescribir ? " choice
     case "$choice" in
         o|O) cp "$src_file" "$dest_file"; echo "  ! sobrescrito: $label" ;;
-        b|B) cp "$dest_file" "$dest_file.bak"; cp "$src_file" "$dest_file"; echo "  ! sobrescrito con backup: $label (.bak guardado)" ;;
+        b|B) backup="$dest_file.$(date +%Y%m%d-%H%M%S).bak"; cp "$dest_file" "$backup"; cp "$src_file" "$dest_file"; echo "  ! sobrescrito con backup: $label ($backup guardado)" ;;
         *)   echo "  . saltado: $label" ;;
     esac
 }
@@ -145,17 +151,32 @@ copy_tree_files() {
     done
 }
 
+copy_tree_recursive_files() {
+    local src_dir="$1"
+    local dest_dir="$2"
+    local label_prefix="$3"
+    local f rel
+
+    mkdir -p "$dest_dir"
+    shopt -s globstar nullglob
+    for f in "$src_dir"/**/*; do
+        [[ -f "$f" ]] || continue
+        rel="${f#"$src_dir"/}"
+        copy_one "$f" "$dest_dir/$rel" "$label_prefix/$rel"
+    done
+    shopt -u globstar nullglob
+}
+
 copy_skill_dir() {
     local src_dir="$1"
     local dest_dir="$2"
     local label="$3"
 
-    mkdir -p "$dest_dir"
-    copy_one "$src_dir/SKILL.md" "$dest_dir/SKILL.md" "$label/SKILL.md"
+    copy_tree_recursive_files "$src_dir" "$dest_dir" "$label"
 }
 
 install_claude_files() {
-    mkdir -p "$CLAUDE_DEST/agents" "$CLAUDE_DEST/commands"
+    mkdir -p "$CLAUDE_DEST/agents" "$CLAUDE_DEST/commands" "$CLAUDE_SKILLS_DEST"
 
     echo
     echo "${bold}Claude Code agents${reset}"
@@ -164,6 +185,13 @@ install_claude_files() {
     echo
     echo "${bold}Claude Code commands${reset}"
     copy_tree_files "$SRC/commands" "$CLAUDE_DEST/commands" "~/.claude/commands"
+
+    echo
+    echo "${bold}Claude Code skills${reset}"
+    for d in "$SRC"/skills/*; do
+        [[ -d "$d" ]] || continue
+        copy_skill_dir "$d" "$CLAUDE_SKILLS_DEST/$(basename "$d")" "~/.claude/skills/$(basename "$d")"
+    done
 
     echo
     echo "${bold}CLAUDE.md global${reset}"
