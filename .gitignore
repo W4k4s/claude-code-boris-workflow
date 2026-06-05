@@ -1,0 +1,14 @@
+# Configuración local de Claude Code (por usuario, no se versiona)
+.claude/settings.local.json
+.mcp.json
+
+# Placeholders del plugin claude-mem (versiones antiguas los creaban en el repo)
+**/CLAUDE.md.claude-mem-*
+
+# IDEs y editores
+.idea/
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
