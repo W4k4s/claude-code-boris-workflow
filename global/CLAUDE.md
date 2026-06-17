@@ -21,6 +21,7 @@ Sustituye o amplía la sección "Tu perfil" con tus datos. El resto puedes dejar
 - `trash` > `rm` — preferir borrado recuperable cuando esté disponible.
 - Preguntar antes de enviar emails, mensajes o cualquier acción externa.
 - Chunked tasks: planificar → ejecutar → `/new` → continuar.
+- **Higiene de memoria:** índice `MEMORY.md` ≤3 KB (si crece, mover narrativa a ficheros); al cerrar un trabajo, condensar su memoria en el momento (≤5 líneas: qué + sha/versión + lección); antes de crear una memoria nueva, ampliar la existente si ya cubre el tema (anti-duplicados); no dejar "pendiente" en nombres/hooks de cosas ya completadas; `/memoria-audit` para revisión global periódica.
 
 ## Metodología de trabajo
 
@@ -40,7 +41,7 @@ Usa subagents cuando la tarea pese mucho en el contexto principal, o para parale
 
 ### Skills y comandos globales
 Workflows instalados como skills en `~/.claude/skills/` y como comandos legacy en `~/.claude/commands/`:
-`/grill` review adversarial pre-ship • `/review-changes` revisar sin commitear • `/quick-commit` commit rápido • `/commit-push-pr` flow completo hasta PR • `/techdebt` limpieza fin sesión • `/worktree` git worktree paralelo • `/cierre-sesion` cierre ordenado
+`/grill` review adversarial pre-ship • `/review-changes` revisar sin commitear • `/quick-commit` commit rápido • `/commit-push-pr` flow completo hasta PR • `/techdebt` limpieza fin sesión • `/worktree` git worktree paralelo • `/cierre-sesion` cierre ordenado • `/memoria-audit` auditoría del sistema de memoria
 
 ### Auto-mejora
 Cuando Claude haga algo mal, actualizar CLAUDE.md (global o del proyecto) con una regla para que no se repita. Frase útil: "ahora actualiza CLAUDE.md para que no vuelvas a cometer ese error".

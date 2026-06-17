@@ -40,6 +40,12 @@ No guardes patrones de codigo, estructura del repo, fixes de bugs concretos, res
 
 Si detectas memorias nuevas, proponlas con una linea indice por memoria de menos de 150 caracteres y pide confirmacion antes de escribirlas. No crees ni actualices `MEMORY.md` si el proyecto no lo usa ya o si el usuario no lo aprueba explicitamente.
 
+**Higiene de memoria (antes de escribir):**
+
+- **Anti-duplicados:** antes de crear una memoria nueva, comprueba si ya existe una del mismo tema (mira el `MEMORY.md` y los nombres de fichero). Si existe, AMPLIALA en vez de crear un duplicado.
+- **Condensar lo cerrado:** si en esta sesion se CERRO un trabajo que tenia memoria asociada (feature mergeada, refactor resuelto, plan ejecutado), condensala a <=5 lineas (que se hizo + sha/version + leccion vigente) y actualiza su linea de indice. Manten el nombre del fichero si tiene wiki-links entrantes.
+- **Indice acotado:** si `MEMORY.md` supera ~3 KB y NO es solo un indice con muchas memorias (~1 linea por memoria es normal), avisa: probablemente hay narrativa que deberia estar en ficheros aparte. Para una revision global periodica de todos los proyectos, sugiere `/memoria-audit`.
+
 ## 4. Tech debt y limpieza
 
 Invoca el skill `techdebt`: detecta codigo duplicado o muerto introducido en la sesion. Lista lo encontrado. No borres sin mi OK.

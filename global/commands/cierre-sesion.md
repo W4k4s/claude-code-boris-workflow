@@ -44,6 +44,19 @@ Si detectas memorias nuevas, proponlas con una linea indice por memoria (<150 ch
 y pide confirmacion antes de escribirlas. No crees ni actualices `MEMORY.md` si el
 proyecto no lo usa ya o si el usuario no lo aprueba explicitamente.
 
+**Higiene de memoria (antes de escribir):**
+- **Anti-duplicados:** antes de crear una memoria nueva, comprueba si ya existe una del
+  mismo tema (mira el `MEMORY.md` y los nombres de fichero). Si existe, AMPLÍALA en vez de
+  crear un duplicado.
+- **Condensar lo cerrado:** si en esta sesión se CERRÓ un trabajo que tenía memoria asociada
+  (feature mergeada, refactor resuelto, plan ejecutado), condénsala a ≤5 líneas (qué se hizo
+  + sha/versión + lección vigente) y actualiza su línea de índice. Mantén el nombre del
+  fichero si tiene wiki-links entrantes.
+- **Índice acotado:** si `MEMORY.md` supera ~3 KB y NO es solo un índice con muchas memorias
+  (~1 línea por memoria es normal), avísame: probablemente hay narrativa que debería estar en
+  ficheros aparte. Para una revisión global periódica de todos los proyectos, sugiere
+  `/memoria-audit`.
+
 ## 4. Tech debt y limpieza
 Invoca el skill `techdebt`: detecta código duplicado o muerto introducido en la
 sesión. Lista lo encontrado. **No borres sin mi OK.**
