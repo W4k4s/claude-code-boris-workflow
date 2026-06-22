@@ -189,6 +189,9 @@ Skills/comandos importantes:
 | `/techdebt` | Detecta deuda técnica | Al final de una sesión o tras refactor |
 | `/worktree` | Crea trabajo paralelo | Cuando quieres aislar otra tarea |
 | `/cierre-sesion` | Cierre ordenado | Antes de terminar o cambiar de contexto |
+| `/plan-visual` | Convierte un plan en artefacto HTML particionado, revisado y listo para ejecución paralela | Después de planificar, antes de ejecutar |
+
+`/plan-visual` es solo Claude Code por ahora (la paridad con Codex/OpenCode es follow-up).
 
 Ejemplo de uso:
 

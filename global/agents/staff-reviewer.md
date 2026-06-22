@@ -16,6 +16,7 @@ Revisa el plan buscando:
 5. Implicaciones de seguridad
 6. Estrategia de verificación ausente o inadecuada (tests, type checks, QA manual)
 7. Problemas de dependencias u orden
+8. Paralelizabilidad: si el plan está pensado para ejecución multi-agente / en paralelo, verifica que las unidades de trabajo tengan **fronteras de fichero disjuntas** (dos agentes no deben tocar el mismo fichero), **dependencias declaradas** entre unidades, y **criterio de verificación por unidad**. Señala cualquier solapamiento de ficheros como riesgo de colisión de escritura, y cualquier dependencia implícita no declarada como riesgo de orden.
 
 Para cada issue:
 

@@ -28,6 +28,8 @@ Sustituye o amplía la sección "Tu perfil" con tus datos. El resto puedes dejar
 ### Plan mode primero
 Tareas no triviales (3+ pasos) empiezan en plan mode (`shift+tab` x2). Itera el plan; no codees hasta que quede claro. Si la implementación se tuerce, vuelve a plan mode en vez de insistir.
 
+El setting `showClearContextOnPlanAccept` (a nivel raíz de `~/.claude/settings.json`, booleano, por defecto `false`) en `true` restaura la opción de "limpiar contexto" al aprobar un plan. Flujo Boris para un plan grande: planificar → `staff-reviewer` → HTML particionado en Unidades de Trabajo con `/plan-visual` → `/new` (contexto limpio) → ejecutar las WU.
+
 ### Verificar antes de cerrar
 Tras escribir código: typecheck/lint/tests si existen. Para UI: arrancar dev server y probar en navegador. No marques tarea completada sin haberlo probado. Cada proyecto puede añadir verificaciones específicas en su propio CLAUDE.md.
 
@@ -41,7 +43,7 @@ Usa subagents cuando la tarea pese mucho en el contexto principal, o para parale
 
 ### Skills y comandos globales
 Workflows instalados como skills en `~/.claude/skills/` y como comandos legacy en `~/.claude/commands/`:
-`/grill` review adversarial pre-ship • `/review-changes` revisar sin commitear • `/quick-commit` commit rápido • `/commit-push-pr` flow completo hasta PR • `/techdebt` limpieza fin sesión • `/worktree` git worktree paralelo • `/cierre-sesion` cierre ordenado • `/memoria-audit` auditoría del sistema de memoria
+`/grill` review adversarial pre-ship • `/review-changes` revisar sin commitear • `/quick-commit` commit rápido • `/commit-push-pr` flow completo hasta PR • `/techdebt` limpieza fin sesión • `/worktree` git worktree paralelo • `/cierre-sesion` cierre ordenado • `/memoria-audit` auditoría del sistema de memoria • `/plan-visual` plan → HTML particionado + review (solo Claude Code)
 
 ### Auto-mejora
 Cuando Claude haga algo mal, actualizar CLAUDE.md (global o del proyecto) con una regla para que no se repita. Frase útil: "ahora actualiza CLAUDE.md para que no vuelvas a cometer ese error".

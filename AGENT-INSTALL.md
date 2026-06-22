@@ -123,6 +123,9 @@ OpenCode:
 | Tech debt cleanup | `/techdebt` | `$boris-techdebt` | `/techdebt` |
 | Parallel worktree | `/worktree` | `$boris-worktree` | `/worktree` |
 | Session close | `/cierre-sesion` | `$boris-cierre-sesion` | `/cierre-sesion` |
+| Plan to partitioned HTML | `/plan-visual` | `— (follow-up)` | `— (follow-up)` |
+
+`/plan-visual` is Claude-Code-only in this iteration; Codex and OpenCode parity is a follow-up.
 
 ## Expected Verification
 
@@ -130,7 +133,8 @@ After installing Claude on native Windows:
 
 - Check `%USERPROFILE%\.claude\skills\grill\SKILL.md` exists.
 - Restart Claude Desktop.
-- In the Code tab, type `/` and confirm `grill`, `review-changes`, `quick-commit`, and `cierre-sesion` appear.
+- In the Code tab, type `/` and confirm `grill`, `review-changes`, `quick-commit`, `cierre-sesion`, and `plan-visual` (Claude Code only) appear.
+- Confirm `~/.claude/settings.json` is installed with the root-level `showClearContextOnPlanAccept` setting (never overwriting an existing user settings.json).
 - Run `/quick-commit Estoy probando. No hagas commit; dime que checks harias y espera confirmacion.` and confirm it waits for explicit approval.
 
 After installing Codex on native Windows:

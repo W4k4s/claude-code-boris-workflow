@@ -196,6 +196,10 @@ install_claude_files() {
     echo
     echo "${bold}CLAUDE.md global${reset}"
     copy_template_only "$SRC/CLAUDE.md" "$CLAUDE_DEST/CLAUDE.md" "~/.claude/CLAUDE.md"
+
+    echo
+    echo "${bold}settings.json global${reset}"
+    copy_template_only "$SRC/settings.json" "$CLAUDE_DEST/settings.json" "~/.claude/settings.json"
 }
 
 install_codex_files() {

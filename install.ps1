@@ -230,6 +230,10 @@ function Install-ClaudeFiles {
     Write-Host ""
     Write-Host "CLAUDE.md global"
     Copy-TemplateOnly -SrcFile (Join-Path $script:Src "CLAUDE.md") -DestFile (Join-Path $ClaudeDest "CLAUDE.md") -Label "~/.claude/CLAUDE.md"
+
+    Write-Host ""
+    Write-Host "settings.json global"
+    Copy-TemplateOnly -SrcFile (Join-Path $script:Src "settings.json") -DestFile (Join-Path $ClaudeDest "settings.json") -Label "~/.claude/settings.json"
 }
 
 function Install-CodexFiles {
