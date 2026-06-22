@@ -189,6 +189,9 @@ Important skills/commands:
 | `/techdebt` | Finds technical debt | At the end of a session or after a refactor |
 | `/worktree` | Creates parallel work | When you want to isolate another task |
 | `/cierre-sesion` | Structured session close | Before finishing or switching context |
+| `/plan-visual` | Turn a plan into a partitioned HTML artifact, reviewed and ready for parallel execution | After planning, before executing |
+
+`/plan-visual` is Claude Code only for now (Codex/OpenCode parity is a follow-up).
 
 Example:
 

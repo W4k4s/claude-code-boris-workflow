@@ -168,7 +168,7 @@ To verify Claude Desktop Code after installation:
 
 1. Restart Claude Desktop completely.
 2. Open the Code tab in a local project.
-3. Type `/` and confirm `grill`, `review-changes`, `quick-commit`, and `cierre-sesion` appear.
+3. Type `/` and confirm `grill`, `review-changes`, `quick-commit`, `cierre-sesion`, and `plan-visual` (Claude Code only) appear.
 4. Run `/quick-commit Estoy probando. No hagas commit; dime que checks harias y espera confirmacion.` and confirm it does not commit without explicit approval.
 
 Personal filesystem skills may not appear in the desktop **Customize > Skills** view even when they are installed correctly. Treat the slash menu and actual command behavior as the source of truth.
@@ -195,6 +195,9 @@ The validated behavior for Codex App on Windows is: files install under `%USERPR
 | Tech debt cleanup | `/techdebt` | `$boris-techdebt` | `/techdebt` |
 | Parallel worktree | `/worktree` | `$boris-worktree` | `/worktree` |
 | Session close | `/cierre-sesion` | `$boris-cierre-sesion` | `/cierre-sesion` |
+| Plan to partitioned HTML | `/plan-visual` | `— (follow-up)` | `— (follow-up)` |
+
+`/plan-visual` is Claude-Code-only for now: it turns a plan into a partitioned HTML artifact (work units with disjoint file boundaries), reviewed by `staff-reviewer` until APPROVED, then hands off with a clean context. Codex and OpenCode parity is a follow-up.
 
 ## Directory Layout
 
