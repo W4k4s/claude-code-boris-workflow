@@ -61,6 +61,15 @@ The goal is not to install more tooling for the sake of it. The goal is to make 
 - **Portable setup**: install everything or only the tool you use.
 - **Team-friendly docs**: non-expert users can start with the practical guides.
 
+## The Planning Workflow
+
+The headline feature is the planning loop, and it works in two layers:
+
+- **Plan mode (no command):** enter plan mode, describe the idea, and on approval Claude Code offers to clear the context before executing, so the assistant starts with only the approved plan and none of the exploration noise. That clear-context option is the native `showClearContextOnPlanAccept` setting, shipped enabled in `~/.claude/settings.json`. The installer never overwrites an existing settings.json, so if you already have one, add the root-level key by hand: `{ "showClearContextOnPlanAccept": true }`.
+- **`/plan-visual` (for large plans):** an optional layer that partitions the plan into work units with disjoint file boundaries, reviews it with `staff-reviewer` until approved, renders it as an HTML artifact, and saves the Markdown to `~/.claude/plans/`. It follows the planner/evaluator pattern (the planner is not the validator, so gaps surface before any code is written) and leaves the plan ready for parallel multi-agent execution.
+
+`/plan-visual` and the setting are Claude Code only for now (Codex/OpenCode parity is a follow-up). Full details and a when-to-use-which table are in [USER-GUIDE.md](USER-GUIDE.md) (English) and [GUIA-USO.md](GUIA-USO.md) (Spanish).
+
 ## Quick Install
 
 Install everything:
