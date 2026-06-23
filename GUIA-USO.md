@@ -288,6 +288,8 @@ Buen prompt:
 Propón un plan corto. Incluye riesgos y comandos de verificación. Espera mi OK antes de implementar.
 ```
 
+Cuando apruebas un plan, Claude Code puede limpiar el contexto antes de ejecutar, dejando al asistente solo con el plan aprobado (sin el ruido de la fase de exploración). Este repo activa esa opción por defecto. Si el plan es grande y quieres revisión adversarial, vista en HTML o ejecución en paralelo, usa `/plan-visual`. Lo tienes detallado más abajo, en "El flujo de planificación".
+
 ### 3. Ejecutar
 
 Ejecutar significa hacer el cambio mínimo correcto.
@@ -347,6 +349,60 @@ En Codex:
 $boris-cierre-sesion
 ```
 
+## El flujo de planificación: plan mode + /plan-visual
+
+Esta es la mejora más importante del workflow. Hay dos capas y casi nunca necesitas la segunda.
+
+### Capa 1: plan mode (el día a día, sin comandos)
+
+El flujo normal de cualquier tarea no trivial:
+
+1. Entra en plan mode con `Shift+Tab` dos veces.
+2. Describe la idea en lenguaje normal. El asistente explora y propone un plan, sin tocar código.
+3. Al aprobar el plan, aparece la opción de limpiar el contexto. Acéptala.
+4. El asistente arranca la ejecución con el contexto limpio, siguiendo el plan.
+
+No hace falta ningún comando: plan mode más tu idea más aprobar ya te da el ciclo "planificar, limpiar, ejecutar".
+
+Esa opción de limpiar contexto al aprobar la controla un ajuste nativo de Claude Code, `showClearContextOnPlanAccept`. Viene desactivada por defecto, así que la opción "había desaparecido". Este repo la distribuye activada en `~/.claude/settings.json`. Si ya tenías un settings.json propio, el instalador no lo toca (para no pisar tu config): añade la clave a mano, a nivel raíz del JSON.
+
+```json
+{
+  "showClearContextOnPlanAccept": true
+}
+```
+
+Por qué importa: planificar y ejecutar en el mismo contexto satura la ventana con el ruido de la fase de exploración. Limpiar el contexto al empezar a ejecutar deja al asistente solo con el plan aprobado, que es justo lo que necesita. Menos ruido, menos deriva, mejor resultado.
+
+### Capa 2: /plan-visual (solo para planes grandes)
+
+`/plan-visual` es una capa opcional encima del plan. Úsalo cuando el plan es gordo y quieres una o varias de estas cosas:
+
+- Que un revisor escéptico (`staff-reviewer`) destroce el plan antes de tocar código.
+- Verlo como página HTML para revisarlo de un vistazo (tabla de unidades de trabajo y grafo de dependencias).
+- Partirlo para ejecutarlo en paralelo con varios agentes sin que se pisen.
+
+Hace cinco pasos, en orden:
+
+0. Comprueba que el setting de limpiar contexto está activo.
+1. Particiona el plan en Unidades de Trabajo (WU), cada una con sus ficheros (fronteras disjuntas, dos WU no tocan el mismo fichero), sus dependencias y su criterio de verificación.
+2. Revisa con `staff-reviewer` hasta que apruebe. El revisor evalúa también que la partición sea paralelizable de verdad.
+3. Renderiza el plan como artefacto HTML y guarda el Markdown canónico en `~/.claude/plans/`.
+4. Handoff: te recuerda limpiar contexto y deja el plan listo para ejecutar (no lanza los agentes por ti todavía).
+
+Por qué mejora el resultado: sigue el patrón planner/evaluator de Anthropic (quien planifica no es quien valida, así se cazan los huecos antes de escribir código) y la idea de que un plan en HTML obliga a revisarlo de verdad, en vez de aprobar un muro de texto sin leerlo. Y al estar particionado en fronteras disjuntas, puedes lanzar varios agentes a la vez sin colisiones.
+
+### Cuándo usar qué
+
+| Situación | Qué usar |
+|---|---|
+| Tarea normal de 3+ pasos | Solo plan mode (sin comando) |
+| Quieres revisión adversarial del plan | `/plan-visual` |
+| El plan es grande y lo quieres ver en HTML | `/plan-visual` |
+| Quieres ejecutar en paralelo con varios agentes | `/plan-visual` |
+
+`/plan-visual` y el setting `showClearContextOnPlanAccept` son de momento solo para Claude Code. La paridad con Codex y OpenCode es un follow-up.
+
 ## Flujos por tamaño de tarea
 
 ### Tarea pequeña
@@ -391,16 +447,18 @@ Flujo:
 
 1. Discovery amplio.
 2. Plan por fases.
-3. Review del plan con `staff-reviewer`.
-4. Implementar por chunks.
-5. Verificar cada chunk.
+3. `/plan-visual`: particiona el plan en unidades de trabajo, lo revisa con `staff-reviewer` y lo deja en HTML, listo para ejecutar en paralelo.
+4. Limpiar contexto al aprobar (`/new`) y ejecutar las unidades, en paralelo las que no dependan entre sí.
+5. Verificar cada unidad.
 6. Review adversarial con `/grill` o `$boris-grill`.
 7. Cierre de sesión.
+
+En una tarea grande, `/plan-visual` es donde más se nota: la revisión adversarial caza huecos antes de escribir código, y la partición en fronteras disjuntas te deja lanzar varios agentes a la vez sin que se pisen.
 
 Prompt:
 
 ```text
-Esta es una tarea grande. Haz discovery project-wide, plantea fases pequeñas y pide review del plan con staff-reviewer antes de tocar código.
+Esta es una tarea grande. Haz discovery project-wide, plantea fases pequeñas y pasa el plan por /plan-visual para revisarlo y particionarlo antes de tocar código.
 ```
 
 ## Cómo usar los agentes

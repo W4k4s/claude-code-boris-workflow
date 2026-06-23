@@ -288,6 +288,8 @@ Good prompt:
 Propose a short plan. Include risks and verification commands. Wait for my OK before implementing.
 ```
 
+When you approve a plan, Claude Code can clear the context before executing, leaving the assistant with only the approved plan (without the noise of the exploration phase). This repo enables that option by default. If the plan is large and you want adversarial review, an HTML view, or parallel execution, use `/plan-visual`. It is detailed below, in "The Planning Workflow".
+
 ### 3. Execute
 
 Execution means making the smallest correct change.
@@ -347,6 +349,60 @@ In Codex:
 $boris-cierre-sesion
 ```
 
+## The Planning Workflow: Plan Mode + /plan-visual
+
+This is the most important improvement in the workflow. There are two layers, and you almost never need the second one.
+
+### Layer 1: plan mode (the daily driver, no commands)
+
+The normal flow for any non-trivial task:
+
+1. Enter plan mode with `Shift+Tab` twice.
+2. Describe the idea in plain language. The assistant explores and proposes a plan, without touching code.
+3. When you approve the plan, the option to clear the context appears. Accept it.
+4. The assistant starts executing with a clean context, following the plan.
+
+No command needed: plan mode plus your idea plus approve already gives you the "plan, clear, execute" cycle.
+
+That clear-context-on-approve option is controlled by a native Claude Code setting, `showClearContextOnPlanAccept`. It ships disabled by default, which is why the option "had disappeared". This repo distributes it enabled in `~/.claude/settings.json`. If you already had your own settings.json, the installer does not touch it (so it never clobbers your config): add the key by hand, at the root level of the JSON.
+
+```json
+{
+  "showClearContextOnPlanAccept": true
+}
+```
+
+Why it matters: planning and executing in the same context floods the window with the noise of the exploration phase. Clearing the context as execution starts leaves the assistant with only the approved plan, which is exactly what it needs. Less noise, less drift, better result.
+
+### Layer 2: /plan-visual (for large plans only)
+
+`/plan-visual` is an optional layer on top of the plan. Use it when the plan is big and you want one or more of these:
+
+- A skeptical reviewer (`staff-reviewer`) to tear the plan apart before any code is written.
+- To see it as an HTML page you can review at a glance (work-unit table and dependency graph).
+- To partition it for parallel execution by several agents without collisions.
+
+It runs five steps, in order:
+
+0. Checks that the clear-context setting is active.
+1. Partitions the plan into Work Units (WU), each with its files (disjoint boundaries, two WU never touch the same file), its dependencies, and its verification criterion.
+2. Reviews with `staff-reviewer` until it approves. The reviewer also checks that the partition is genuinely parallelizable.
+3. Renders the plan as an HTML artifact and saves the canonical Markdown to `~/.claude/plans/`.
+4. Handoff: reminds you to clear context and leaves the plan ready to execute (it does not launch the agents for you yet).
+
+Why it improves the result: it follows Anthropic's planner/evaluator pattern (the one who plans is not the one who validates, so gaps get caught before any code is written) and the idea that a plan in HTML forces a real review, instead of approving a wall of text without reading it. And because it is partitioned along disjoint boundaries, you can launch several agents at once without collisions.
+
+### When to use which
+
+| Situation | What to use |
+|---|---|
+| Normal task with 3+ steps | Plan mode only (no command) |
+| You want adversarial review of the plan | `/plan-visual` |
+| The plan is large and you want to see it in HTML | `/plan-visual` |
+| You want to execute in parallel with several agents | `/plan-visual` |
+
+`/plan-visual` and the `showClearContextOnPlanAccept` setting are Claude Code only for now. Parity with Codex and OpenCode is a follow-up.
+
 ## Workflows By Task Size
 
 ### Small Task
@@ -391,16 +447,18 @@ Flow:
 
 1. Broad discovery.
 2. Plan by phases.
-3. Review the plan with `staff-reviewer`.
-4. Implement in chunks.
-5. Verify each chunk.
+3. `/plan-visual`: partition the plan into work units, review it with `staff-reviewer`, and leave it in HTML, ready to execute in parallel.
+4. Clear the context on approval (`/new`) and execute the units, in parallel for the ones that do not depend on each other.
+5. Verify each unit.
 6. Run adversarial review with `/grill` or `$boris-grill`.
 7. Close the session.
+
+On a large task, `/plan-visual` is where it shows the most: the adversarial review catches gaps before any code is written, and the partition along disjoint boundaries lets you launch several agents at once without collisions.
 
 Prompt:
 
 ```text
-This is a large task. Do project-wide discovery, propose small phases, and ask staff-reviewer to review the plan before editing code.
+This is a large task. Do project-wide discovery, propose small phases, and run the plan through /plan-visual to review and partition it before editing code.
 ```
 
 ## How To Use The Agents
