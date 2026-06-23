@@ -2,8 +2,12 @@
 .claude/settings.local.json
 .mcp.json
 
-# Placeholders del plugin claude-mem (versiones antiguas los creaban en el repo)
+# Placeholders del plugin claude-mem.
+# Versiones antiguas los creaban con sufijo; las nuevas crean CLAUDE.md en cada subdir de global/.
+# Ignoramos esos placeholders pero preservamos el global/CLAUDE.md versionado (plantilla distribuible).
 **/CLAUDE.md.claude-mem-*
+global/**/CLAUDE.md
+!global/CLAUDE.md
 
 # IDEs y editores
 .idea/
