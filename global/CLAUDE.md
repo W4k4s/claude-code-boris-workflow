@@ -41,8 +41,8 @@ Agents globales en `~/.claude/agents/`:
 
 Usa subagents cuando la tarea pese mucho en el contexto principal, o para paralelizar trabajo independiente.
 
-### Skills y comandos globales
-Workflows instalados como skills en `~/.claude/skills/` y como comandos legacy en `~/.claude/commands/`:
+### Skills globales
+Workflows instalados como skills en `~/.claude/skills/`:
 `/grill` review adversarial pre-ship • `/review-changes` revisar sin commitear • `/quick-commit` commit rápido • `/commit-push-pr` flow completo hasta PR • `/techdebt` limpieza fin sesión • `/worktree` git worktree paralelo • `/cierre-sesion` cierre ordenado • `/memoria-audit` auditoría del sistema de memoria • `/plan-visual` plan → HTML particionado + review (solo Claude Code)
 
 ### Auto-mejora

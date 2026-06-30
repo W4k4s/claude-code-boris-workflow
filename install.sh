@@ -175,16 +175,26 @@ copy_skill_dir() {
     copy_tree_recursive_files "$src_dir" "$dest_dir" "$label"
 }
 
+cleanup_legacy_claude_commands() {
+    local cmd_dir="$CLAUDE_DEST/commands"
+    [[ -d "$cmd_dir" ]] || return 0
+    echo; echo "${bold}Limpieza de comandos legacy de Claude${reset}"
+    for d in "$SRC"/skills/*; do
+        [[ -d "$d" ]] || continue
+        local slug legacy bak; slug="$(basename "$d")"; legacy="$cmd_dir/$slug.md"
+        if [[ -f "$legacy" ]]; then
+            bak="$legacy.$(date +%Y%m%d-%H%M%S).bak"; mv "$legacy" "$bak"
+            echo "  - retirado comando legacy: ~/.claude/commands/$slug.md (ahora skill) -> $bak"
+        fi
+    done
+}
+
 install_claude_files() {
-    mkdir -p "$CLAUDE_DEST/agents" "$CLAUDE_DEST/commands" "$CLAUDE_SKILLS_DEST"
+    mkdir -p "$CLAUDE_DEST/agents" "$CLAUDE_SKILLS_DEST"
 
     echo
     echo "${bold}Claude Code agents${reset}"
     copy_tree_files "$SRC/agents" "$CLAUDE_DEST/agents" "~/.claude/agents"
-
-    echo
-    echo "${bold}Claude Code commands${reset}"
-    copy_tree_files "$SRC/commands" "$CLAUDE_DEST/commands" "~/.claude/commands"
 
     echo
     echo "${bold}Claude Code skills${reset}"
@@ -192,6 +202,8 @@ install_claude_files() {
         [[ -d "$d" ]] || continue
         copy_skill_dir "$d" "$CLAUDE_SKILLS_DEST/$(basename "$d")" "~/.claude/skills/$(basename "$d")"
     done
+
+    cleanup_legacy_claude_commands
 
     echo
     echo "${bold}CLAUDE.md global${reset}"
