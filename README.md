@@ -41,7 +41,7 @@
 
 This repo packages a global development workflow inspired by Boris Cherny's Claude Code methodology and adapts it to three local AI coding tools:
 
-- **Claude Code**: global `CLAUDE.md`, agents, skills, and legacy slash commands.
+- **Claude Code**: global `CLAUDE.md`, agents, and skills.
 - **Codex**: global `AGENTS.md`, custom agents, skills, and command safety rules.
 - **OpenCode**: global `AGENTS.md`, agents, commands, and conservative permissions.
 
@@ -136,7 +136,7 @@ At the end, summarize what you installed and what you left untouched.
 
 | Tool | Global instructions | Agents | Workflows | Guardrails |
 | --- | --- | --- | --- | --- |
-| Claude Code | `~/.claude/CLAUDE.md` | `~/.claude/agents/*.md` | `~/.claude/skills/*` and legacy `~/.claude/commands/*.md` | Existing Claude permission flow |
+| Claude Code | `~/.claude/CLAUDE.md` | `~/.claude/agents/*.md` | `~/.claude/skills/*` | Existing Claude permission flow |
 | Codex | `~/.codex/AGENTS.md` | `~/.codex/agents/*.toml` | `~/.agents/skills/boris-*` | `~/.codex/rules/boris-safety.rules` |
 | OpenCode | `~/.config/opencode/AGENTS.md` | `~/.config/opencode/agents/*.md` | `~/.config/opencode/commands/*.md` | `~/.config/opencode/opencode.json` |
 
@@ -148,12 +148,12 @@ The workflow uses each tool's native extension model instead of pretending all c
 | --- | --- | --- | --- | --- |
 | Global instructions | `CLAUDE.md` | `AGENTS.md` | `AGENTS.md` | Loaded at session start to set behavior and guardrails. |
 | Specialized agents | Markdown agents in `~/.claude/agents` | TOML agents in `~/.codex/agents` | Markdown agents in `~/.config/opencode/agents` | Used for architecture, plan review, and simplification. |
-| User-invoked workflows | Skills in `~/.claude/skills`; legacy commands in `~/.claude/commands` | Skills in `~/.agents/skills` | Commands in `~/.config/opencode/commands` | Same workflow, different packaging. |
+| User-invoked workflows | Skills in `~/.claude/skills` | Skills in `~/.agents/skills` | Commands in `~/.config/opencode/commands` | Same workflow, different packaging. |
 | Invocation | `/grill`, `/quick-commit` | `$boris-grill`, `$boris-quick-commit` | `/grill`, `/quick-commit` | Codex skills use the `boris-` prefix to avoid collisions. |
 
 Limitations to know:
 
-- Claude Code custom commands are now treated like skills by Claude Code, but legacy `~/.claude/commands` files are still installed for compatibility.
+- Claude Code workflows are installed as skills under `~/.claude/skills`. On reinstall, any legacy `~/.claude/commands` files for these workflows are moved aside to `.bak` (they are now skills).
 - Claude Desktop Code may show these workflows in the `/` menu without listing personal filesystem skills under **Customize > Skills**.
 - Codex App and Codex CLI use skills, not global custom slash commands. In the app, invoke them with `$boris-*` or by selecting the matching skill when available.
 - Agents are not the same thing as skills. Agents shape delegated specialist behavior; skills and commands are reusable workflows you invoke.

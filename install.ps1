@@ -208,9 +208,25 @@ function Copy-SkillDir {
     Copy-TreeRecursiveFiles -SrcDir $SrcDir -DestDir $DestDir -LabelPrefix $Label
 }
 
+function Cleanup-LegacyClaudeCommands {
+    $cmdDir = Join-Path $ClaudeDest "commands"
+    if (-not (Test-Path -LiteralPath $cmdDir)) { return }
+
+    Write-Host ""
+    Write-Host "Limpieza de comandos legacy de Claude"
+    Get-ChildItem -LiteralPath (Join-Path $script:Src "skills") -Directory | ForEach-Object {
+        $slug = $_.Name
+        $legacy = Join-Path $cmdDir "$slug.md"
+        if (Test-Path -LiteralPath $legacy) {
+            $bak = "$legacy.$(Get-Date -Format 'yyyyMMdd-HHmmss').bak"
+            Move-Item -LiteralPath $legacy -Destination $bak -Force
+            Write-Host "  - retirado comando legacy: ~/.claude/commands/$slug.md (ahora skill) -> $bak"
+        }
+    }
+}
+
 function Install-ClaudeFiles {
     [IO.Directory]::CreateDirectory((Join-Path $ClaudeDest "agents")) | Out-Null
-    [IO.Directory]::CreateDirectory((Join-Path $ClaudeDest "commands")) | Out-Null
     [IO.Directory]::CreateDirectory($ClaudeSkillsDest) | Out-Null
 
     Write-Host ""
@@ -218,14 +234,12 @@ function Install-ClaudeFiles {
     Copy-TreeFiles -SrcDir (Join-Path $script:Src "agents") -DestDir (Join-Path $ClaudeDest "agents") -LabelPrefix "~/.claude/agents"
 
     Write-Host ""
-    Write-Host "Claude Code commands"
-    Copy-TreeFiles -SrcDir (Join-Path $script:Src "commands") -DestDir (Join-Path $ClaudeDest "commands") -LabelPrefix "~/.claude/commands"
-
-    Write-Host ""
     Write-Host "Claude Code skills"
     Get-ChildItem -LiteralPath (Join-Path $script:Src "skills") -Directory | ForEach-Object {
         Copy-SkillDir -SrcDir $_.FullName -DestDir (Join-Path $ClaudeSkillsDest $_.Name) -Label "~/.claude/skills/$($_.Name)"
     }
+
+    Cleanup-LegacyClaudeCommands
 
     Write-Host ""
     Write-Host "CLAUDE.md global"

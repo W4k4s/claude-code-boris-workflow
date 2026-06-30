@@ -136,7 +136,7 @@ Si instalaste en WSL y luego abres Claude Desktop en Windows, es normal que no v
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Claude
 ```
 
-Para Claude Desktop Code, los workflows se instalan como skills en `~/.claude/skills` y tambien como comandos legacy en `~/.claude/commands`. Si la carpeta `skills` no existia antes, reinicia la app.
+Para Claude Desktop Code, los workflows se instalan como skills en `~/.claude/skills`. Si la carpeta `skills` no existia antes, reinicia la app.
 
 Lo importante no es que aparezcan en todas las pantallas de personalizacion, sino que sean invocables. En nuestras pruebas, Claude Desktop Code en Windows carga los workflows desde el menu `/`, aunque las skills personales no siempre aparezcan en **Personalizar > Skills**.
 
@@ -162,13 +162,13 @@ OpenCode no necesita esta separacion desktop/CLI en este repo: se usa con su con
 
 | Herramienta | Instrucciones globales | Agentes | Workflows invocables | Como se invocan |
 | --- | --- | --- | --- | --- |
-| Claude Code CLI/Desktop | `~/.claude/CLAUDE.md` | `~/.claude/agents/*.md` | `~/.claude/skills/*` y legacy `~/.claude/commands/*.md` | `/grill`, `/quick-commit` |
+| Claude Code CLI/Desktop | `~/.claude/CLAUDE.md` | `~/.claude/agents/*.md` | `~/.claude/skills/*` | `/grill`, `/quick-commit` |
 | Codex CLI/App | `~/.codex/AGENTS.md` | `~/.codex/agents/*.toml` | `~/.agents/skills/boris-*` | `$boris-grill`, `$boris-quick-commit` |
 | OpenCode | `~/.config/opencode/AGENTS.md` | `~/.config/opencode/agents/*.md` | `~/.config/opencode/commands/*.md` | `/grill`, `/quick-commit` |
 
 Limitaciones y matices:
 
-- Claude Code mantiene comandos legacy, pero el formato moderno es skill en `~/.claude/skills`.
+- Los workflows de Claude Code se instalan como skills en `~/.claude/skills`. Al reinstalar, los comandos legacy de `~/.claude/commands` de estos workflows se retiran a `.bak` (ahora son skills).
 - Claude Desktop Code puede mostrar los workflows en `/` aunque no los liste en **Personalizar > Skills**.
 - Codex no usa custom slash commands globales para este flujo; usa skills `$boris-*`.
 - Los agentes no son botones de workflow. Sirven para delegar tareas especializadas y no sustituyen a `/grill` o `$boris-grill`.
@@ -176,7 +176,7 @@ Limitaciones y matices:
 
 ## Claude Code en la práctica
 
-Claude Code instala instrucciones en `~/.claude/CLAUDE.md`, agentes en `~/.claude/agents`, skills en `~/.claude/skills` y comandos legacy en `~/.claude/commands`.
+Claude Code instala instrucciones en `~/.claude/CLAUDE.md`, agentes en `~/.claude/agents` y skills en `~/.claude/skills`.
 
 Skills/comandos importantes:
 

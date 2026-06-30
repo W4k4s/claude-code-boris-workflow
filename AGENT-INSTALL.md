@@ -68,13 +68,13 @@ Do not describe agents, commands, and skills as the same thing:
 | --- | --- | --- | --- |
 | Global instructions | `CLAUDE.md` | `AGENTS.md` | `AGENTS.md` |
 | Agents | `~/.claude/agents/*.md` | `~/.codex/agents/*.toml` | `~/.config/opencode/agents/*.md` |
-| Workflows | `~/.claude/skills/*` plus legacy `~/.claude/commands/*.md` | `~/.agents/skills/boris-*` | `~/.config/opencode/commands/*.md` |
+| Workflows | `~/.claude/skills/*` | `~/.agents/skills/boris-*` | `~/.config/opencode/commands/*.md` |
 | User invocation | `/grill` | `$boris-grill` | `/grill` |
 
 Important limitations:
 
 - Claude Desktop Code may expose installed filesystem workflows through the `/` menu even when they do not appear under **Customize > Skills**.
-- Claude legacy commands remain installed for compatibility, but `~/.claude/skills` is the modern package shape.
+- Claude workflows ship as skills under `~/.claude/skills`. On reinstall, any legacy `~/.claude/commands/<slug>.md` for these workflows is moved aside to `.bak` (they are now skills).
 - Codex App and CLI use `$boris-*` skills rather than global custom slash commands.
 - OpenCode commands are native OpenCode commands and are configured separately from Claude and Codex.
 - Agents are specialist assistants, not workflow launchers.
@@ -96,7 +96,7 @@ Claude Code:
 - `global/CLAUDE.md` -> `~/.claude/CLAUDE.md`
 - `global/agents/*.md` -> `~/.claude/agents/`
 - `global/skills/*` -> `~/.claude/skills/*`
-- `global/commands/*.md` -> `~/.claude/commands/`
+- On reinstall, legacy `~/.claude/commands/<slug>.md` for these workflows is moved aside to `.bak` (they are now skills).
 
 Codex:
 
